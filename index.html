@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>仙乐太子 · Merit Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#f5c040;--amber:#e8901a;--crimson:#b82840;
+  --ivory:#ede6d0;--lav:#8a7db8;--jade:#5ec49a;--rose:#b06880;
+  --bg:#040210;--panel:rgba(6,3,15,0.78);
+  --border:rgba(232,144,26,0.18);--lbl:rgba(138,125,184,0.80);
+  --mist:rgba(237,230,208,0.35);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);}
+body{font-family:'Noto Serif',serif;color:var(--ivory);}
+
+/* ── SCENE BACKGROUNDS ── */
+.bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none;background-size:cover;background-position:center;opacity:0;transition:opacity 2.2s ease;filter:brightness(0.38) saturate(1.55);transform:translate(var(--par-x,0px),var(--par-y,0px)) scale(1.08);will-change:transform;}
+.bg-scene.active{opacity:1;}
+#bgs-overview{background-image:url('tgcf/WhatsApp Image 2026-05-26 at 20.38.59.jpeg');background-position:center 40%;}
+#bgs-tasks   {background-image:url('tgcf/WhatsApp Image 2026-05-26 at 20.38.59 (2).jpeg');background-position:center 25%;}
+#bgs-habits  {background-image:url('tgcf/WhatsApp Image 2026-05-26 at 20.39.30.jpeg');background-position:center 20%;}
+#bgs-journal {background-image:url('tgcf/WhatsApp Image 2026-05-26 at 20.38.59 (1).jpeg');background-position:center 65%;}
+/* Drifting fog layers — depth and atmosphere */
+.fog{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#fog1{background:radial-gradient(ellipse 72% 52% at 14% 82%,rgba(232,120,20,0.072),transparent 72%);animation:fogA 32s ease-in-out infinite alternate;}
+#fog2{background:radial-gradient(ellipse 62% 48% at 88% 14%,rgba(180,32,58,0.055),transparent 72%);animation:fogB 40s ease-in-out infinite alternate;}
+#fog3{background:radial-gradient(ellipse 85% 38% at 50% 52%,rgba(88,48,138,0.042),transparent 68%);animation:fogC 24s ease-in-out infinite;}
+@keyframes fogA{from{transform:translate(-6%,-3%) scale(1.06);}to{transform:translate(5%,2.5%) scale(1.0);}}
+@keyframes fogB{from{transform:translate(4%,2%);}to{transform:translate(-5%,-2.5%);}}
+@keyframes fogC{0%,100%{transform:scale(1) rotate(-0.8deg);}50%{transform:scale(1.10) rotate(0.8deg);}}
+#atmo{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 68% 40% at 50% 0%,rgba(210,125,25,0.14),transparent 65%),radial-gradient(ellipse 44% 50% at 2% 95%,rgba(148,22,48,0.10),transparent 65%),radial-gradient(ellipse 52% 38% at 98% 5%,rgba(60,40,120,0.08),transparent 65%),radial-gradient(ellipse 52% 32% at 50% 100%,rgba(80,28,100,0.06),transparent 60%);will-change:transform;}
+#vignette{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 72% 56% at 50% 28%,transparent 18%,rgba(2,1,8,0.94) 100%);}
+/* Global XP bar */
+#xp-bar{position:fixed;top:0;left:0;z-index:4;height:2px;background:linear-gradient(90deg,var(--crimson),var(--rose),var(--gold),var(--amber));background-size:200%;animation:silkFlow 5s linear infinite;box-shadow:0 0 10px rgba(245,192,64,0.45);transition:width 1.3s cubic-bezier(0.34,1.56,0.64,1);width:0%;}
+/* Cursor ambient glow */
+#cursor-glow{position:fixed;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(245,192,64,0.048) 0%,rgba(245,192,64,0.014) 42%,transparent 70%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);transition:left 0.16s ease,top 0.16s ease;top:0;left:0;}
+#bg{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+/* ── APP SHELL ── */
+#app{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;}
+#status-bar{flex-shrink:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:linear-gradient(180deg,rgba(4,2,14,0.70),transparent);pointer-events:none;}
+#sb-left{display:flex;align-items:baseline;gap:14px;}
+#sb-rank{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--gold);letter-spacing:0.04em;text-shadow:0 0 20px rgba(245,192,64,0.35);}
+#sb-sp{font-size:10px;letter-spacing:0.28em;color:var(--lbl);text-transform:uppercase;}
+#sb-right{display:flex;align-items:center;gap:8px;pointer-events:auto;}
+.shrine-pill{padding:5px 12px;border-radius:20px;font-size:11px;color:var(--lbl);cursor:pointer;transition:all 0.22s;border:1px solid rgba(255,255,255,0.07);background:transparent;font-family:'Noto Serif',serif;letter-spacing:0.04em;}
+.shrine-pill:hover{color:var(--ivory);border-color:rgba(232,144,26,0.35);}
+.shrine-pill.active{color:var(--amber);border-color:rgba(232,144,26,0.42);background:rgba(232,144,26,0.10);box-shadow:0 0 12px rgba(232,144,26,0.12);}
+#scene-wrap{flex:1;position:relative;overflow:hidden;}
+.scene{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity 0.50s ease,transform 0.50s ease,filter 0.50s ease;transform:translateY(18px);filter:blur(6px);scrollbar-width:thin;scrollbar-color:rgba(232,144,26,0.18) transparent;}
+.scene::-webkit-scrollbar{width:4px;}
+.scene::-webkit-scrollbar-thumb{background:rgba(232,144,26,0.18);border-radius:2px;}
+.scene.active{opacity:1;pointer-events:auto;transform:none;filter:blur(0);}
+.scene.exit{opacity:0;transform:translateY(-12px);filter:blur(6px);}
+#sc-overview{align-items:center;}
+.sc-body{width:100%;max-width:680px;padding:28px 24px 60px;}
+#sc-overview .sc-body{max-width:1020px;padding:12px 32px 60px;}
+
+/* ── OVERVIEW ── */
+.ov-layout{display:grid;grid-template-columns:260px 1fr;gap:48px;align-items:start;padding-top:32px;min-height:calc(100vh - 136px);}
+@media(max-width:780px){.ov-layout{grid-template-columns:1fr;gap:28px;min-height:auto;}}
+.char-card{display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none;}
+.char-frame{position:relative;width:220px;height:310px;border-radius:10px;overflow:hidden;border:1px solid rgba(245,192,64,0.20);box-shadow:0 0 50px rgba(232,144,26,0.10),0 0 120px rgba(232,144,26,0.04);transition:box-shadow 0.45s,transform 0.45s;}
+.char-card:hover .char-frame{box-shadow:0 0 65px rgba(245,192,64,0.22),0 0 160px rgba(232,144,26,0.09);transform:translateY(-5px) scale(1.012);}
+.char-img{width:100%;height:100%;object-fit:cover;transition:filter 0.8s;}
+.char-frame::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 48%,rgba(2,1,8,0.78) 100%);}
+.cc{position:absolute;width:14px;height:14px;border-color:rgba(245,192,64,0.32);border-style:solid;z-index:2;pointer-events:none;transition:border-color 0.4s;}
+.char-card:hover .cc{border-color:rgba(245,192,64,0.60);}
+.cc.tl{top:7px;left:7px;border-width:1px 0 0 1px;}
+.cc.tr{top:7px;right:7px;border-width:1px 1px 0 0;}
+.cc.bl{bottom:7px;left:7px;border-width:0 0 1px 1px;}
+.cc.br{bottom:7px;right:7px;border-width:0 1px 1px 0;}
+.char-chapter{position:absolute;bottom:0;left:0;right:0;z-index:3;padding:16px 14px 12px;background:linear-gradient(0deg,rgba(3,1,12,0.94) 0%,transparent);text-align:center;pointer-events:none;}
+.ch-num{font-family:'Noto Serif SC',serif;font-size:8px;letter-spacing:0.55em;color:var(--amber);text-transform:uppercase;opacity:0.70;display:block;margin-bottom:3px;}
+.ch-title{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ivory);letter-spacing:0.05em;text-shadow:0 0 18px rgba(245,192,64,0.28);}
+.char-hint{font-size:9px;letter-spacing:0.28em;color:rgba(138,125,184,0.38);text-transform:uppercase;margin-top:9px;transition:color 0.3s;}
+.char-card:hover .char-hint{color:rgba(245,192,64,0.55);}
+.char-bubble{margin-top:11px;max-width:220px;text-align:center;background:rgba(4,2,14,0.80);border:1px solid rgba(245,192,64,0.13);border-radius:8px;padding:9px 14px;backdrop-filter:blur(12px);position:relative;cursor:pointer;transition:border-color 0.3s;}
+.char-bubble:hover{border-color:rgba(245,192,64,0.28);}
+.char-bubble::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:10px;height:6px;clip-path:polygon(50% 0%,0% 100%,100% 100%);background:rgba(245,192,64,0.13);}
+.bubble-text{font-size:11px;color:rgba(237,230,208,0.68);font-style:italic;line-height:1.62;letter-spacing:0.02em;transition:opacity 0.3s;}
+.ov-right{display:flex;flex-direction:column;}
+.ov-lbl{font-family:'Noto Serif SC',serif;font-size:9px;letter-spacing:0.50em;color:var(--lbl);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:14px;}
+.ov-lbl::before,.ov-lbl::after{content:"";display:inline-block;width:36px;height:1px;background:linear-gradient(90deg,transparent,rgba(138,125,184,0.35));}
+.ov-lbl::after{transform:scaleX(-1);}
+.ov-rank{font-family:'Noto Serif SC',serif;font-size:36px;font-weight:300;color:var(--gold);letter-spacing:0.02em;line-height:1.1;text-shadow:0 0 60px rgba(245,192,64,0.26),0 4px 20px rgba(0,0,0,0.9);margin-bottom:6px;}
+.ov-tier{font-size:11px;color:var(--lbl);font-style:italic;letter-spacing:0.12em;margin-bottom:22px;}
+.ov-sp-num{font-family:'Noto Serif SC',serif;font-size:60px;font-weight:300;line-height:1;color:var(--gold);letter-spacing:-0.03em;text-shadow:0 0 50px rgba(245,192,64,0.20);display:block;animation:spBreath 5.5s ease-in-out infinite;}
+@keyframes spBreath{0%,100%{text-shadow:0 0 50px rgba(245,192,64,0.18);}50%{text-shadow:0 0 90px rgba(245,192,64,0.46),0 0 180px rgba(245,192,64,0.10);}}
+.ov-sp-lbl{font-size:9px;letter-spacing:0.40em;color:var(--lbl);text-transform:uppercase;margin:5px 0 20px;}
+.ov-prog{margin-bottom:22px;max-width:380px;}
+.ov-prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--lbl);margin-bottom:8px;}
+.ov-track{height:2px;background:rgba(255,255,255,0.07);border-radius:2px;}
+.ov-fill{height:2px;width:0%;border-radius:2px;background:linear-gradient(90deg,var(--rose),var(--gold),var(--amber));background-size:200% 100%;transition:width 1.1s cubic-bezier(0.34,1.56,0.64,1);animation:silkFlow 6s linear infinite;position:relative;}
+.ov-fill::after{content:"";position:absolute;right:-3px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold),0 0 18px rgba(245,192,64,0.55);animation:tipPulse 2.4s ease-in-out infinite alternate;}
+@keyframes tipPulse{from{box-shadow:0 0 5px var(--gold),0 0 12px rgba(245,192,64,0.38);}to{box-shadow:0 0 10px var(--gold),0 0 26px rgba(245,192,64,0.68);}}
+@keyframes silkFlow{0%{background-position:0%}100%{background-position:200%}}
+.ov-prog-next{font-size:10px;color:rgba(237,230,208,0.26);margin-top:8px;font-style:italic;}
+.ov-stats{display:flex;align-items:center;gap:0;margin-bottom:22px;max-width:260px;}
+.ov-stat{flex:1;text-align:center;}
+.ov-stat-val{font-family:'Noto Serif SC',serif;font-size:28px;color:var(--gold);line-height:1;text-shadow:0 0 20px rgba(245,192,64,0.20);}
+.ov-stat-lbl{font-size:9px;letter-spacing:0.22em;color:var(--lbl);text-transform:uppercase;margin-top:5px;}
+.ov-divider{width:1px;height:34px;background:rgba(255,255,255,0.08);flex-shrink:0;}
+.ov-quote{font-style:italic;font-size:12px;color:rgba(237,230,208,0.38);letter-spacing:0.02em;line-height:1.75;margin-bottom:20px;max-width:360px;transition:opacity 0.45s;}
+.ov-quote::before{content:"「 ";color:var(--amber);opacity:0.55;}
+.ov-quote::after{content:" 」";color:var(--amber);opacity:0.55;}
+.ov-cta{background:none;border:none;font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:0.18em;color:rgba(232,144,26,0.58);cursor:pointer;transition:color 0.3s,text-shadow 0.3s;text-transform:uppercase;padding:8px 0;text-align:left;}
+.ov-cta:hover{color:var(--amber);text-shadow:0 0 20px rgba(232,144,26,0.40);}
+
+/* ── CHIBI STAGE ── */
+.chibi-stage{position:relative;width:260px;height:360px;user-select:none;}
+.c-glow{position:absolute;border-radius:50%;pointer-events:none;z-index:0;filter:blur(42px);}
+.c-glow-hc{width:160px;height:130px;background:rgba(184,40,64,0.20);bottom:56px;left:-8px;}
+.c-glow-xl{width:170px;height:140px;background:rgba(245,192,64,0.13);bottom:46px;right:-8px;}
+.chibi-ground{position:absolute;bottom:70px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,192,64,0.14),transparent);}
+.chibi-wrap{position:absolute;bottom:72px;z-index:2;transition:opacity 0.7s ease;}
+.c-hc{left:4px;animation:chibFL 4.6s ease-in-out infinite;}
+.c-xl{right:4px;animation:chibFR 4.1s ease-in-out infinite 0.9s;}
+.chibi-wrap.c-hidden{opacity:0;pointer-events:none;}
+.chibi{height:158px;width:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.68));transition:filter 0.35s;}
+@keyframes chibFL{0%,100%{transform:translateY(0) rotate(-0.6deg);}50%{transform:translateY(-11px) rotate(0.6deg);}}
+@keyframes chibFR{0%,100%{transform:translateY(0) rotate(0.6deg);}50%{transform:translateY(-9px) rotate(-0.5deg);}}
+/* Reactions — !important overrides idle float */
+.chibi-wrap.r-bounce {animation:rBounce 0.55s cubic-bezier(0.34,1.56,0.64,1) !important;}
+.chibi-wrap.r-happy  {animation:rHappy  0.76s ease !important;}
+.chibi-wrap.r-excited{animation:rExcited 0.92s ease !important;}
+.chibi-wrap.r-poke   {animation:rPoke   0.42s cubic-bezier(0.34,1.56,0.64,1) !important;}
+.chibi-wrap.r-nod    {animation:rNod    0.46s ease !important;}
+@keyframes rBounce{0%{transform:translateY(0) scale(1);}28%{transform:translateY(-24px) scale(1.08,0.93);}58%{transform:translateY(5px) scale(0.95,1.08);}78%{transform:translateY(-8px) scale(1.04,0.97);}100%{transform:translateY(0) scale(1);}}
+@keyframes rHappy{0%{transform:translateY(0) scale(1);}18%{transform:translateY(-18px) scale(1.10) rotate(8deg);}38%{transform:translateY(-12px) scale(1.10) rotate(-6deg);}56%{transform:translateY(-20px) scale(1.13) rotate(7deg);}76%{transform:translateY(-4px) scale(1.05) rotate(-2deg);}100%{transform:translateY(0) scale(1) rotate(0);}}
+@keyframes rExcited{0%,100%{transform:translateY(0) scale(1);}12%{transform:translateY(-28px) scale(1.15);}26%{transform:translateY(6px) scale(0.93,1.09);}42%{transform:translateY(-22px) scale(1.13);}58%{transform:translateY(4px) scale(0.95,1.07);}74%{transform:translateY(-13px) scale(1.09);}89%{transform:translateY(2px);}}
+@keyframes rPoke{0%{transform:scale(1);}30%{transform:scale(0.84,1.17);}62%{transform:scale(1.14,0.90);}100%{transform:scale(1);}}
+@keyframes rNod{0%,100%{transform:translateY(0) rotate(0);}25%{transform:translateY(-7px) rotate(-5deg);}50%{transform:translateY(0) rotate(5deg);}75%{transform:translateY(-3px) rotate(-2deg);}}
+/* Chibi bubble + chapter */
+.chibi-bubble{position:absolute;bottom:8px;left:0;right:0;padding:9px 13px;background:rgba(4,2,14,0.80);border:1px solid rgba(245,192,64,0.14);border-radius:8px;backdrop-filter:blur(12px);cursor:pointer;transition:border-color 0.3s;z-index:3;}
+.chibi-bubble:hover{border-color:rgba(245,192,64,0.32);}
+.chibi-chapter{position:absolute;top:4px;left:0;right:0;text-align:center;z-index:3;pointer-events:none;}
+
+/* ── CONTENT SCENES ── */
+.sc-header{margin-bottom:24px;}
+.sc-title{font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:0.40em;color:var(--lbl);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.sc-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.07),transparent);}
+.shrine-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.shrine-tag{padding:4px 12px;border-radius:20px;font-size:11px;color:var(--lbl);cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.07);background:transparent;font-family:'Noto Serif',serif;}
+.shrine-tag:hover{color:var(--ivory);border-color:rgba(232,144,26,0.32);}
+.shrine-tag.active{color:var(--amber);border-color:rgba(232,144,26,0.42);background:rgba(232,144,26,0.09);}
+.shrine-del-tag{color:rgba(255,255,255,0.18);cursor:pointer;margin-left:4px;font-size:13px;transition:color 0.2s;}
+.shrine-del-tag:hover{color:var(--crimson);}
+.add-form{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;padding:16px 0 18px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.add-form input[type="text"]{flex:1;min-width:180px;padding:9px 0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.12);color:var(--ivory);font-family:'Noto Serif',serif;font-size:14px;outline:none;transition:border-color 0.22s;}
+.add-form input[type="text"]::placeholder{color:rgba(237,230,208,0.22);}
+.add-form input[type="text"]:focus{border-bottom-color:rgba(232,144,26,0.50);}
+.add-form-row{display:flex;gap:10px;align-items:center;}
+.add-form select{padding:7px 0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.10);color:var(--mist);font-family:'Noto Serif',serif;font-size:12px;outline:none;cursor:pointer;}
+.add-form select option{background:#0a0620;color:var(--ivory);}
+.add-form input[type="number"]{width:64px;text-align:center;padding:7px 0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.10);color:var(--mist);font-family:'Noto Serif',serif;font-size:12px;outline:none;}
+.btn-add{padding:8px 20px;background:rgba(232,144,26,0.12);border:1px solid rgba(232,144,26,0.28);border-radius:5px;color:var(--amber);font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:0.12em;cursor:pointer;transition:all 0.22s;white-space:nowrap;}
+.btn-add:hover{background:rgba(232,144,26,0.22);border-color:rgba(232,144,26,0.52);box-shadow:0 0 18px rgba(232,144,26,0.16);}
+.add-shrine-inline{display:flex;gap:8px;margin-top:4px;padding:10px 0 0;border-top:1px solid rgba(255,255,255,0.04);}
+.add-shrine-inline input{flex:1;padding:6px 0;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.08);color:var(--ivory);font-family:'Noto Serif',serif;font-size:12px;outline:none;}
+.add-shrine-inline input::placeholder{color:rgba(237,230,208,0.20);}
+.btn-shrine{background:none;border:none;color:rgba(232,144,26,0.50);font-family:'Noto Serif',serif;font-size:11px;cursor:pointer;transition:color 0.2s;letter-spacing:0.06em;white-space:nowrap;}
+.btn-shrine:hover{color:var(--amber);}
+.task-list{display:flex;flex-direction:column;}
+.task{display:grid;grid-template-columns:32px 1fr auto auto auto;align-items:center;gap:14px;padding:18px 12px;border-radius:8px;border-left:2px solid transparent;transition:background 0.28s,border-color 0.28s,box-shadow 0.28s;margin-bottom:1px;}
+.task+.task{border-top:1px solid rgba(255,255,255,0.032);}
+.task:hover{background:rgba(255,255,255,0.028);box-shadow:0 2px 24px rgba(0,0,0,0.18);}
+.task.calamity:hover{border-left-color:rgba(184,40,64,0.60);box-shadow:0 0 22px rgba(184,40,64,0.07);}
+.task.trial:hover{border-left-color:rgba(232,144,26,0.60);box-shadow:0 0 22px rgba(232,144,26,0.05);}
+.task.blessing:hover{border-left-color:rgba(94,196,154,0.60);}
+.task.done{opacity:0.26;}
+.task.done .task-name{text-decoration:line-through;}
+.check{width:28px;height:28px;flex-shrink:0;border:1px solid rgba(255,255,255,0.18);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.22s;}
+.check:hover{border-color:var(--gold);box-shadow:0 0 12px rgba(245,192,64,0.28);}
+.check.checked{background:radial-gradient(circle at 38% 32%,rgba(255,255,200,0.8),var(--gold) 50%,var(--amber));border-color:transparent;box-shadow:0 0 16px rgba(245,192,64,0.55);}
+.check.checked::after{content:"✦";color:#160800;font-size:12px;}
+.task-info{min-width:0;}
+.task-name{font-size:14px;color:var(--ivory);line-height:1.4;}
+.task-date{font-size:10px;color:rgba(237,230,208,0.22);margin-top:2px;letter-spacing:0.06em;}
+.tier-tag{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-weight:700;white-space:nowrap;font-family:'Noto Serif SC',serif;}
+.tier-tag.calamity{color:rgba(190,90,110,0.90);background:rgba(184,40,64,0.12);}
+.tier-tag.trial{color:rgba(228,165,75,0.90);background:rgba(232,144,26,0.10);}
+.tier-tag.blessing{color:rgba(100,198,155,0.90);background:rgba(94,196,154,0.10);}
+.sp-tag{font-family:'Noto Serif SC',serif;font-size:11px;color:rgba(245,192,64,0.60);white-space:nowrap;}
+.sp-tag::before{content:"+";}
+.sp-tag::after{content:" SP";opacity:0.55;font-size:9px;}
+.del-btn{background:transparent;border:none;color:rgba(255,255,255,0.12);cursor:pointer;font-size:17px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all 0.2s;padding:0;}
+.del-btn:hover{color:var(--crimson);background:rgba(184,40,64,0.10);}
+.empty{text-align:center;padding:52px 20px;color:rgba(237,230,208,0.20);font-style:italic;font-size:14px;line-height:1.9;}
+.empty-glyph{font-size:24px;display:block;margin-bottom:14px;opacity:0.35;}
+.habit-list{display:flex;flex-direction:column;}
+.habit{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:16px;padding:14px 10px;border-radius:6px;transition:background 0.2s;}
+.habit+.habit{border-top:1px solid rgba(255,255,255,0.04);}
+.habit:hover{background:rgba(255,255,255,0.022);}
+.habit-name{font-size:14px;color:var(--ivory);}
+.habit-stage{font-size:10px;color:var(--lbl);margin-top:3px;letter-spacing:0.12em;text-transform:uppercase;}
+.flames{display:flex;gap:3px;}
+.fl{font-size:13px;opacity:0.15;transition:opacity 0.3s;}
+.fl.lit{opacity:1;animation:flicker 2.2s ease-in-out infinite alternate;}
+@keyframes flicker{from{transform:scale(1) rotate(-1.5deg);}to{transform:scale(1.14) rotate(1.5deg);}}
+.streak-val{font-family:'Noto Serif SC',serif;font-size:26px;color:var(--gold);min-width:40px;text-align:center;text-shadow:0 0 18px rgba(245,192,64,0.22);}
+.streak-val::after{content:"d";font-size:10px;color:var(--lbl);}
+.cult-btn{padding:7px 14px;background:transparent;border:1px solid rgba(232,144,26,0.24);border-radius:5px;color:rgba(232,144,26,0.65);font-family:'Noto Serif',serif;font-size:12px;cursor:pointer;transition:all 0.22s;white-space:nowrap;}
+.cult-btn:hover{border-color:var(--amber);color:var(--amber);box-shadow:0 0 12px rgba(232,144,26,0.16);}
+.cult-btn.done-today{border-color:rgba(94,196,154,0.24);color:rgba(94,196,154,0.60);cursor:default;}
+.cult-btn.done-today:hover{box-shadow:none;}
+.j-entry{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.j-entry:last-child{border-bottom:none;}
+.j-text{font-size:13px;color:rgba(237,230,208,0.68);flex:1;line-height:1.6;}
+.j-right{text-align:right;white-space:nowrap;}
+.j-sp{font-family:'Noto Serif SC',serif;color:var(--gold);font-size:12px;opacity:0.75;}
+.j-date{font-size:10px;color:var(--lbl);margin-top:2px;}
+#bottom-nav{flex-shrink:0;height:68px;display:flex;align-items:center;justify-content:center;gap:48px;background:linear-gradient(0deg,rgba(4,2,14,0.75),transparent);}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px 10px;transition:all 0.25s;position:relative;}
+.nav-glyph{font-family:'Noto Serif SC',serif;font-size:18px;color:var(--lbl);transition:color 0.25s,text-shadow 0.25s;line-height:1;}
+.nav-lbl{font-size:8px;letter-spacing:0.30em;text-transform:uppercase;color:rgba(138,125,184,0.55);transition:color 0.25s;}
+.nav-btn.active .nav-glyph{color:var(--gold);text-shadow:0 0 18px rgba(245,192,64,0.45);}
+.nav-btn.active .nav-lbl{color:rgba(245,192,64,0.55);}
+.nav-btn.active::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:20px;height:1px;background:linear-gradient(90deg,transparent,var(--amber),transparent);box-shadow:0 0 8px rgba(232,144,26,0.55);}
+.nav-btn:hover .nav-glyph{color:var(--ivory);}
+#toast-wrap{position:fixed;top:22px;right:22px;z-index:50;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:rgba(5,2,14,0.93);border-top:1px solid rgba(232,144,26,0.28);border-radius:10px;padding:13px 18px;color:var(--ivory);font-family:'Noto Serif',serif;font-size:13px;max-width:290px;line-height:1.5;box-shadow:0 0 0 1px rgba(255,255,255,0.05),0 20px 50px rgba(0,0,0,0.78);animation:tIn 0.40s cubic-bezier(0.34,1.56,0.64,1),tOut 0.45s ease 4.5s forwards;pointer-events:auto;backdrop-filter:blur(20px);}
+.toast-title{color:var(--amber);font-family:'Noto Serif SC',serif;letter-spacing:0.10em;margin-bottom:3px;font-size:11px;}
+@keyframes tIn{from{transform:translateX(115%) scale(0.95);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes tOut{to{transform:translateX(115%);opacity:0;}}
+#rankup-overlay{position:fixed;inset:0;z-index:100;background:rgba(3,1,10,0.96);display:none;align-items:center;justify-content:center;cursor:pointer;}
+#rankup-overlay.show{display:flex;animation:fadeIn 0.55s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.ru-card{text-align:center;padding:48px 70px;position:relative;max-width:520px;animation:ruRise 0.85s cubic-bezier(0.34,1.2,0.64,1) 0.15s both;}
+@keyframes ruRise{from{transform:translateY(24px);opacity:0;}to{transform:none;opacity:1;}}
+.ru-card::before,.ru-card::after{content:"";position:absolute;width:24px;height:24px;border-color:rgba(245,192,64,0.30);border-style:solid;}
+.ru-card::before{top:12px;left:12px;border-width:1px 0 0 1px;}
+.ru-card::after{bottom:12px;right:12px;border-width:0 1px 1px 0;}
+.ru-eye{font-size:9px;letter-spacing:0.60em;color:var(--amber);text-transform:uppercase;margin-bottom:16px;opacity:0.65;}
+.ru-sub{font-size:10px;letter-spacing:0.25em;color:var(--lbl);margin-bottom:8px;}
+.ru-name{font-family:'Noto Serif SC',serif;font-size:38px;color:var(--gold);text-shadow:0 0 50px rgba(245,192,64,0.48),0 0 100px rgba(232,144,26,0.20);margin:8px 0 18px;letter-spacing:0.04em;}
+.ru-art{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:18px;opacity:0.78;filter:brightness(0.82) saturate(1.2);}
+.ru-quote{color:rgba(138,125,184,0.80);font-style:italic;font-size:13px;line-height:1.75;margin-bottom:30px;max-width:330px;margin-inline:auto;}
+.btn-mandate{padding:10px 26px;background:rgba(232,144,26,0.10);border:1px solid rgba(232,144,26,0.28);border-radius:5px;color:var(--amber);font-family:'Noto Serif SC',serif;font-size:11px;letter-spacing:0.14em;cursor:pointer;transition:all 0.22s;}
+.btn-mandate:hover{background:rgba(232,144,26,0.20);border-color:rgba(232,144,26,0.50);}
+.sparkle{position:fixed;pointer-events:none;width:4px;height:4px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);animation:sFly 0.90s ease-out forwards;}
+.sparkle.red{background:var(--crimson);box-shadow:0 0 6px var(--crimson);}
+@keyframes sFly{0%{transform:scale(0) translate(0,0);opacity:1;}100%{transform:scale(1.6) translate(var(--dx),var(--dy));opacity:0;}}
+.petal{position:fixed;pointer-events:none;width:8px;height:11px;border-radius:60% 60% 50% 20%;opacity:0.82;animation:petalDrift var(--dur,3.2s) ease-in var(--dly,0s) forwards;}
+@keyframes petalDrift{0%{transform:translateY(-10px) translateX(0px) rotate(var(--rot,0deg));opacity:0.85;}40%{transform:translateY(var(--mid,180px)) translateX(var(--sx,25px)) rotate(calc(var(--rot,0deg) + 140deg));opacity:0.72;}100%{transform:translateY(var(--fall,380px)) translateX(calc(var(--sx,25px)*-0.4)) rotate(calc(var(--rot,0deg) + 320deg));opacity:0;}}
+
+/* ════════════════════════════════════
+   COLLECTION / GACHA
+   ════════════════════════════════════ */
+#sb-bf{display:none;align-items:center;gap:5px;pointer-events:none;margin-right:8px;}
+#sb-bf-i{font-size:14px;opacity:0.75;}
+#sb-bf-n{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--gold);letter-spacing:0.08em;}
+#bottom-nav{gap:38px;}
+.gacha-banner{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding:18px 22px;background:rgba(245,192,64,0.04);border:1px solid rgba(245,192,64,0.10);border-radius:12px;}
+.gacha-bf{display:flex;align-items:baseline;gap:9px;}
+.gacha-bf-i{font-size:22px;margin-right:2px;}
+.gacha-bf-n{font-family:'Noto Serif SC',serif;font-size:44px;color:var(--gold);line-height:1;text-shadow:0 0 28px rgba(245,192,64,0.26);}
+.gacha-bf-lbl{font-size:9px;letter-spacing:0.32em;color:var(--lbl);text-transform:uppercase;}
+.btn-gacha{padding:11px 26px;background:linear-gradient(135deg,rgba(184,40,64,0.15),rgba(232,144,26,0.15));border:1px solid rgba(245,192,64,0.30);border-radius:8px;color:var(--gold);font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:0.14em;cursor:pointer;transition:all 0.3s;}
+.btn-gacha:hover{border-color:rgba(245,192,64,0.65);box-shadow:0 0 24px rgba(245,192,64,0.18);}
+.btn-gacha:disabled{opacity:0.28;cursor:not-allowed;box-shadow:none;}
+.gacha-hint{font-size:10px;color:var(--lbl);letter-spacing:0.18em;text-align:center;margin-bottom:8px;font-style:italic;}
+.gacha-prog{font-size:10px;color:var(--lbl);letter-spacing:0.18em;text-align:center;margin-bottom:22px;}
+.gacha-prog span.g{color:var(--gold);font-family:'Noto Serif SC',serif;}
+.gacha-prog span.b{color:#6490f0;}
+.coll-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(106px,1fr));gap:12px;}
+.s-card{border-radius:11px;aspect-ratio:3/4;position:relative;overflow:hidden;cursor:pointer;transition:transform 0.28s,box-shadow 0.28s;user-select:none;}
+.s-card:hover:not(.locked){transform:translateY(-5px) scale(1.04);}
+.s-card.locked{filter:grayscale(1) brightness(0.22);cursor:default;}
+.s-card.common{box-shadow:0 2px 10px rgba(0,0,0,0.58),0 0 0 1px rgba(190,170,130,0.20);}
+.s-card.rare{box-shadow:0 3px 16px rgba(80,120,255,0.20),0 0 0 1px rgba(100,140,240,0.40);}
+.s-card.legendary{box-shadow:0 4px 22px rgba(245,192,64,0.36),0 0 0 1.5px rgba(245,192,64,0.58);animation:legendGlow 3s ease-in-out infinite alternate;}
+@keyframes legendGlow{from{box-shadow:0 4px 22px rgba(245,192,64,0.30),0 0 0 1.5px rgba(245,192,64,0.52);}to{box-shadow:0 6px 34px rgba(245,192,64,0.52),0 0 0 1.5px rgba(245,192,64,0.86),0 0 44px rgba(245,192,64,0.14);}}
+.s-grad{position:absolute;inset:0;}
+.s-img{position:absolute;inset:0;background-size:cover;filter:brightness(0.48) saturate(1.35);}
+.s-sym{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);font-family:'Noto Serif SC',serif;font-size:44px;opacity:0.60;line-height:1;pointer-events:none;}
+.s-foot{position:absolute;bottom:0;left:0;right:0;padding:7px 8px 9px;background:linear-gradient(0deg,rgba(2,1,8,0.96) 0%,rgba(2,1,8,0.50) 72%,transparent 100%);}
+.s-char{font-family:'Noto Serif SC',serif;font-size:8px;color:var(--gold);letter-spacing:0.12em;opacity:0.70;display:block;margin-bottom:1px;}
+.s-name{font-size:9px;color:var(--ivory);letter-spacing:0.03em;line-height:1.25;display:block;}
+.s-dots{display:flex;gap:3px;margin-top:4px;}
+.s-dots span{width:4px;height:4px;border-radius:50%;background:rgba(190,170,130,0.50);}
+.s-card.rare .s-dots span{background:rgba(110,150,245,0.78);}
+.s-card.legendary .s-dots span{background:var(--gold);box-shadow:0 0 4px rgba(245,192,64,0.52);}
+/* pull overlay */
+#pull-ov{position:fixed;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(1,0,6,0.96);cursor:pointer;}
+#pull-ov.open{display:flex;}
+#pull-wrap{perspective:1100px;width:220px;height:300px;margin-bottom:32px;}
+#pull-card{width:100%;height:100%;transform-style:preserve-3d;position:relative;}
+#pull-card.flipped{animation:cardFlip 0.72s cubic-bezier(0.4,0,0.2,1) forwards;}
+@keyframes cardFlip{0%{transform:rotateY(0) scale(1);}44%{transform:rotateY(90deg) scale(0.88);}100%{transform:rotateY(180deg) scale(1);}}
+#pull-back,#pull-front{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+#pull-back{background:radial-gradient(ellipse at 40% 38%,rgba(90,50,155,0.52),rgba(2,1,8,0.98));border:1px solid rgba(138,125,184,0.22);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(138,125,184,0.14);}
+#pull-back-sym{font-family:'Noto Serif SC',serif;font-size:80px;color:rgba(138,125,184,0.16);animation:backSpin 10s linear infinite;}
+@keyframes backSpin{to{transform:rotate(360deg);}}
+#pull-front{transform:rotateY(180deg);overflow:hidden;}
+#pf-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(0.48) saturate(1.35);}
+#pf-tint{position:absolute;inset:0;background:linear-gradient(180deg,transparent 25%,rgba(2,1,8,0.92) 100%);}
+#pf-sym{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-family:'Noto Serif SC',serif;font-size:88px;opacity:0.52;line-height:1;display:none;}
+#pf-info{position:absolute;bottom:0;left:0;right:0;padding:14px 16px 18px;}
+#pf-rarity{font-size:8px;letter-spacing:0.44em;text-transform:uppercase;font-family:'Noto Serif SC',serif;margin-bottom:5px;}
+#pf-name{font-family:'Noto Serif SC',serif;font-size:17px;color:var(--ivory);letter-spacing:0.04em;margin-bottom:2px;line-height:1.3;}
+#pf-char{font-size:10px;color:rgba(237,230,208,0.52);letter-spacing:0.12em;}
+#pf-badge{font-size:8px;letter-spacing:0.20em;text-transform:uppercase;margin-top:8px;font-weight:700;}
+#pull-tap{font-size:9px;letter-spacing:0.44em;color:rgba(237,230,208,0.24);text-transform:uppercase;animation:tapPulse 2s ease-in-out infinite;}
+@keyframes tapPulse{0%,100%{opacity:0.24;}50%{opacity:0.68;}}
+#pull-flash{position:fixed;inset:0;z-index:410;pointer-events:none;opacity:0;transition:opacity 0.22s;}
+
+/* ── INFO TUTORIAL ── */
+#info-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.11);color:rgba(237,230,208,0.45);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.22s;font-family:'Noto Serif',serif;flex-shrink:0;margin-left:6px;}
+#info-btn:hover{border-color:rgba(245,192,64,0.42);color:var(--gold);background:rgba(245,192,64,0.08);box-shadow:0 0 14px rgba(245,192,64,0.14);}
+#info-ov{position:fixed;inset:0;z-index:200;background:rgba(2,1,8,0.94);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:0 16px 80px;scrollbar-width:thin;scrollbar-color:rgba(232,144,26,0.18) transparent;}
+#info-ov.open{display:flex;animation:fadeIn 0.32s ease;}
+#info-ov::-webkit-scrollbar{width:4px;}
+#info-ov::-webkit-scrollbar-thumb{background:rgba(232,144,26,0.18);border-radius:2px;}
+.info-card{width:100%;max-width:600px;padding:52px 0 32px;position:relative;}
+.info-close{position:fixed;top:18px;right:22px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.11);color:rgba(237,230,208,0.50);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.22s;z-index:201;line-height:1;}
+.info-close:hover{border-color:rgba(184,40,64,0.55);color:var(--crimson);}
+.info-hero{text-align:center;margin-bottom:36px;padding-bottom:30px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.info-hero-glyph{font-family:'Noto Serif SC',serif;font-size:46px;color:var(--gold);opacity:0.68;display:block;text-shadow:0 0 44px rgba(245,192,64,0.26);margin-bottom:14px;}
+.info-hero-title{font-family:'Noto Serif SC',serif;font-size:20px;color:var(--ivory);letter-spacing:0.07em;margin-bottom:10px;}
+.info-hero-sub{font-size:12px;color:rgba(237,230,208,0.45);letter-spacing:0.03em;line-height:1.78;max-width:400px;margin:0 auto;}
+.info-section{margin-bottom:14px;padding:18px 20px;background:rgba(255,255,255,0.025);border-radius:10px;border:1px solid rgba(255,255,255,0.05);transition:border-color 0.3s;}
+.info-section:hover{border-color:rgba(232,144,26,0.14);}
+.info-sec-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.info-sec-glyph{font-family:'Noto Serif SC',serif;font-size:19px;color:var(--amber);opacity:0.82;flex-shrink:0;width:26px;text-align:center;}
+.info-sec-title{font-family:'Noto Serif SC',serif;font-size:12px;color:var(--ivory);letter-spacing:0.10em;}
+.info-body{font-size:12px;color:rgba(237,230,208,0.56);line-height:1.82;letter-spacing:0.015em;}
+.info-body strong{color:rgba(237,230,208,0.88);font-weight:normal;}
+.info-row{display:flex;gap:9px;align-items:baseline;margin-bottom:7px;}
+.info-row:last-child{margin-bottom:0;}
+.itag{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0;font-family:'Noto Serif SC',serif;}
+.itag.blessing{color:rgba(100,198,155,0.90);background:rgba(94,196,154,0.10);}
+.itag.trial{color:rgba(228,165,75,0.90);background:rgba(232,144,26,0.10);}
+.itag.calamity{color:rgba(190,90,110,0.90);background:rgba(184,40,64,0.12);}
+.itag.rare{color:var(--lav);background:rgba(138,125,184,0.12);}
+.itag.legendary{color:var(--gold);background:rgba(245,192,64,0.12);}
+.info-tip{margin-top:12px;padding:9px 13px;background:rgba(245,192,64,0.04);border-left:2px solid rgba(245,192,64,0.26);border-radius:0 6px 6px 0;font-size:11px;color:rgba(237,230,208,0.46);font-style:italic;line-height:1.65;}
+.info-ranks{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;margin-top:10px;}
+.info-rank-row{font-size:11px;color:rgba(237,230,208,0.52);display:flex;justify-content:space-between;gap:8px;}
+.info-rank-row .irsp{color:var(--lbl);font-size:9px;letter-spacing:0.10em;white-space:nowrap;}
+
+/* ── HOME HABITS ── */
+.ov-section-lbl{font-family:'Noto Serif SC',serif;font-size:9px;letter-spacing:0.45em;color:var(--lbl);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.ov-section-lbl::before{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(138,125,184,0.25),transparent);}
+.ov-habits-home{margin-top:16px;margin-bottom:8px;}
+.habit-pill{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(6,3,15,0.52);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:6px;backdrop-filter:blur(8px);transition:border-color 0.25s;}
+.habit-pill:hover{border-color:rgba(232,144,26,0.22);}
+.habit-pill-name{flex:1;font-size:12px;color:var(--ivory);letter-spacing:0.01em;line-height:1.3;}
+.habit-pill-streak{font-family:'Noto Serif SC',serif;font-size:20px;font-weight:300;color:var(--gold);line-height:1;text-shadow:0 0 14px rgba(245,192,64,0.28);}
+.habit-pill-slbl{font-size:8px;color:var(--lbl);letter-spacing:0.18em;text-align:center;text-transform:uppercase;}
+.btn-cult-pill{padding:5px 13px;border-radius:20px;background:rgba(232,144,26,0.10);border:1px solid rgba(232,144,26,0.26);color:var(--amber);font-size:10px;cursor:pointer;font-family:'Noto Serif',serif;letter-spacing:0.06em;transition:all 0.22s;white-space:nowrap;}
+.btn-cult-pill:hover{background:rgba(232,144,26,0.22);border-color:var(--amber);box-shadow:0 0 14px rgba(232,144,26,0.18);}
+.btn-cult-pill.done{color:rgba(94,196,154,0.72);border-color:rgba(94,196,154,0.22);background:rgba(94,196,154,0.07);cursor:default;}
+.habit-pill-empty{font-size:11px;color:rgba(237,230,208,0.22);font-style:italic;padding:10px 0;text-align:center;}
+/* Recent log */
+.ov-recent{margin-top:14px;margin-bottom:18px;}
+.ov-recent-entry{font-size:10px;color:rgba(237,230,208,0.38);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.035);display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+.ov-recent-entry:last-child{border-bottom:none;}
+.ov-recent-sp{color:var(--amber);font-size:9px;white-space:nowrap;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div id="xp-bar"></div>
+<div id="bgs-overview" class="bg-scene active"></div>
+<div id="bgs-tasks"    class="bg-scene"></div>
+<div id="bgs-habits"   class="bg-scene"></div>
+<div id="bgs-journal"  class="bg-scene"></div>
+<div class="fog" id="fog1"></div>
+<div class="fog" id="fog2"></div>
+<div class="fog" id="fog3"></div>
+<div id="atmo"></div>
+<div id="vignette"></div>
+<div id="cursor-glow"></div>
+<canvas id="bg"></canvas>
+
+<div id="app">
+  <div id="status-bar">
+    <div id="sb-left">
+      <div id="sb-rank">Mortal Wanderer</div>
+      <div id="sb-sp">0 SP</div>
+    </div>
+    <div id="sb-right">
+      <div id="sb-bf"><span id="sb-bf-i">🦋</span><span id="sb-bf-n">0</span></div>
+      <button id="info-btn" onclick="toggleInfo()" title="How to use">?</button>
+    </div>
+  </div>
+
+  <div id="scene-wrap">
+    <div class="scene active" id="sc-overview">
+      <div class="sc-body">
+        <div class="ov-layout">
+          <div class="chibi-stage" id="chibi-stage">
+            <div class="c-glow c-glow-hc"></div>
+            <div class="c-glow c-glow-xl"></div>
+            <div class="chibi-ground"></div>
+            <div class="chibi-wrap c-hc c-hidden" id="wrap-hc">
+              <img class="chibi" id="chibi-hc" src="tgcf sticker sprite/hua_default-removebg-preview.png" alt="Hua Cheng"/>
+            </div>
+            <div class="chibi-wrap c-xl" id="wrap-xl">
+              <img class="chibi" id="chibi-xl" src="tgcf sticker sprite/xie_lian_default-removebg-preview.png" alt="Xie Lian"/>
+            </div>
+            <div class="chibi-chapter">
+              <span class="ch-num" id="ch-num">Chapter I · 凡人</span>
+              <span class="ch-title" id="ch-title">The Wandering Prince</span>
+            </div>
+            <div class="chibi-bubble" id="char-bubble">
+              <div class="bubble-text" id="bubble-text">One step is enough.</div>
+            </div>
+          </div>
+          <div class="ov-right">
+            <div class="ov-lbl">cultivation · 修行</div>
+            <div class="ov-rank" id="ov-rank">Mortal Wanderer</div>
+            <div class="ov-tier" id="ov-tier">凡人 · Earthly Path</div>
+            <span class="ov-sp-num" id="ov-sp">0</span>
+            <div class="ov-sp-lbl">spiritual power</div>
+            <div class="ov-prog">
+              <div class="ov-prog-labels"><span id="ov-prog-cur">Current</span><span id="ov-prog-nxt">Next</span></div>
+              <div class="ov-track"><div class="ov-fill" id="ov-fill"></div></div>
+              <div class="ov-prog-next" id="ov-prog-meta"></div>
+            </div>
+            <div class="ov-stats">
+              <div class="ov-stat"><div class="ov-stat-val" id="ov-streak">0</div><div class="ov-stat-lbl">Day Streak</div></div>
+              <div class="ov-divider"></div>
+              <div class="ov-stat"><div class="ov-stat-val" id="ov-cleared">0</div><div class="ov-stat-lbl">Videos Done</div></div>
+            </div>
+            <div class="ov-habits-home" id="ov-habits-home"></div>
+            <div class="ov-recent" id="ov-recent"></div>
+            <div class="ov-quote" id="ov-quote">No matter what, just keep going.</div>
+            <button class="ov-cta" onclick="goScene('tasks')">today's quests →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene" id="sc-tasks">
+      <div class="sc-body">
+        <div class="sc-header">
+          <div class="sc-title">quests · 任务</div>
+        </div>
+        <div class="add-form">
+          <input type="text" id="newTaskTitle" placeholder="Add a quest..." maxlength="120"/>
+          <div class="add-form-row">
+            <select id="newTaskTier"><option value="blessing">🍃 Blessing</option><option value="trial" selected>⚔ Trial</option><option value="calamity">🔥 Calamity</option></select>
+            <input type="number" id="newTaskSP" value="20" min="1" max="999"/>
+            <button class="btn-add" onclick="addTask()">Begin</button>
+          </div>
+        </div>
+        <div class="task-list" id="taskList"></div>
+        <div class="sc-header" style="margin-top:32px;"><div class="sc-title">daily habits · 日修</div></div>
+        <div class="add-form" style="margin-bottom:16px;">
+          <input type="text" id="newHabitTitle" placeholder="Add a daily habit..." maxlength="80"/>
+          <div class="add-form-row">
+            <input type="number" id="newHabitSP" value="15" min="1" max="99"/>
+            <button class="btn-add" onclick="addHabit()">Add Habit</button>
+          </div>
+        </div>
+        <div class="habit-list" id="habitList"></div>
+      </div>
+    </div>
+
+    <div class="scene" id="sc-journal">
+      <div class="sc-body">
+        <div class="sc-header"><div class="sc-title">scroll of deeds · 功德录</div></div>
+        <div id="journalScroll"></div>
+      </div>
+    </div>
+
+    <div class="scene" id="sc-collection">
+      <div class="sc-body">
+        <div class="sc-header"><div class="sc-title">butterfly archive · 蝶藏</div></div>
+        <div class="gacha-banner">
+          <div class="gacha-bf">
+            <span class="gacha-bf-i">🦋</span>
+            <span class="gacha-bf-n" id="gacha-bf-n">0</span>
+            <span class="gacha-bf-lbl">Silver Butterflies</span>
+          </div>
+          <button class="btn-gacha" id="btn-gacha" onclick="doPull()">Draw · 抽卡</button>
+        </div>
+        <div class="gacha-hint" id="gacha-hint"></div>
+        <div class="gacha-prog" id="gacha-prog"></div>
+        <div class="coll-grid" id="coll-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav id="bottom-nav">
+    <button class="nav-btn active" data-sc="overview"><span class="nav-glyph">今</span><span class="nav-lbl">Today</span></button>
+    <button class="nav-btn" data-sc="tasks"><span class="nav-glyph">任</span><span class="nav-lbl">Quests</span></button>
+    <button class="nav-btn" data-sc="collection"><span class="nav-glyph">蝶</span><span class="nav-lbl">Collect</span></button>
+  </nav>
+</div>
+
+<!-- Rank-up overlay -->
+<div id="rankup-overlay" onclick="this.classList.remove('show')">
+  <div class="ru-card">
+    <div class="ru-eye">✦ &nbsp;Ascension&nbsp; ✦</div>
+    <div class="ru-sub">You have been elevated to</div>
+    <div class="ru-name" id="ru-name"></div>
+    <img class="ru-art" id="ru-art" src="" alt=""/>
+    <div class="ru-quote" id="ru-quote"></div>
+    <button class="btn-mandate" onclick="document.getElementById('rankup-overlay').classList.remove('show')">Accept the Mandate of Heaven</button>
+  </div>
+</div>
+
+
+<!-- Pull / Gacha Overlay -->
+<div id="pull-ov">
+  <div id="pull-wrap">
+    <div id="pull-card">
+      <div id="pull-back"><div id="pull-back-sym">蝶</div></div>
+      <div id="pull-front">
+        <div id="pf-bg"></div>
+        <div id="pf-tint"></div>
+        <div id="pf-sym"></div>
+        <div id="pf-info">
+          <div id="pf-rarity"></div>
+          <div id="pf-name"></div>
+          <div id="pf-char"></div>
+          <div id="pf-badge"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="pull-tap">tap anywhere to continue</div>
+</div>
+<div id="pull-flash"></div>
+
+<!-- Info / Tutorial Overlay -->
+<div id="info-ov" onclick="if(event.target===this)toggleInfo()">
+  <button class="info-close" onclick="toggleInfo()">×</button>
+  <div class="info-card">
+
+    <div class="info-hero">
+      <span class="info-hero-glyph">仙</span>
+      <div class="info-hero-title">Merit Ledger · 功德录</div>
+      <div class="info-hero-sub">A Heaven Official's Blessing–themed daily tracker built for your TikTok editing journey. Complete tasks and habits to earn Spiritual Power, rank up through the celestial court, and collect TGCF sticker cards as rewards.</div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-sec-head"><span class="info-sec-glyph">今</span><span class="info-sec-title">Today — Your Daily Home</span></div>
+      <div class="info-body">
+        The <strong>Today tab</strong> is your home base. It shows your current rank, SP total, and progress toward the next rank — plus your <strong>daily habits</strong> with a tap-to-complete button.<br/><br/>
+        Your <strong>day streak</strong> counts how many days in a row you've done any task or habit. The <strong>Videos Done</strong> counter tracks all completed quests. Below your stats you'll see your last few completed actions and a rotating motivational quote.
+      </div>
+      <div class="info-tip">The speech bubble below the character cycles through chapter quotes — tap it to advance. The characters themselves react when you complete things.</div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-sec-head"><span class="info-sec-glyph">任</span><span class="info-sec-title">Quests — Tasks & Habits</span></div>
+      <div class="info-body">
+        <strong>Quests</strong> are one-off tasks. Each has a difficulty tier that determines how much SP you earn when you complete it — tap the circle on the left to check it off:
+        <br/><br/>
+        <div class="info-row"><span class="itag blessing">Blessing</span> Quick or easy. Writing captions, planning a hook, importing clips.</div>
+        <div class="info-row"><span class="itag trial">Trial</span> Normal effort. Filming footage, cutting and sequencing an edit.</div>
+        <div class="info-row"><span class="itag calamity">Calamity</span> Hard or scary. Posting the video, tackling a big collab, a complex edit.</div>
+        <br/>
+        <strong>Daily Habits</strong> live below the quest list. Add a recurring habit (like "Edit & post today's video") and track its streak separately. Each habit completion also earns you <strong>+1 🦋 butterfly</strong>.
+      </div>
+      <div class="info-tip">Completing a Calamity triggers a crimson petal storm and an extra chibi reaction — reserve the tier for things that actually feel daunting.</div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-sec-head"><span class="info-sec-glyph">气</span><span class="info-sec-title">Spiritual Power & Ranks</span></div>
+      <div class="info-body">
+        Every completed task or habit adds <strong>SP</strong> to your total. The glowing bar at the very top of the screen and the progress bar on Today both reflect your progress toward the next rank. There are 8 ranks to climb:<br/>
+        <div class="info-ranks">
+          <div class="info-rank-row">Mortal Wanderer<span class="irsp">0 SP</span></div>
+          <div class="info-rank-row">Devoted Pilgrim<span class="irsp">100 SP</span></div>
+          <div class="info-rank-row">Ghost-Touched<span class="irsp">300 SP</span></div>
+          <div class="info-rank-row">Spirit Cultivator<span class="irsp">600 SP</span></div>
+          <div class="info-rank-row">Heavenly Official<span class="irsp">1 000 SP</span></div>
+          <div class="info-rank-row">Martial God<span class="irsp">1 800 SP</span></div>
+          <div class="info-rank-row">Flower-Crowned God<span class="irsp">3 000 SP</span></div>
+          <div class="info-rank-row">Crown Prince of Xianle<span class="irsp">5 000 SP</span></div>
+        </div>
+      </div>
+      <div class="info-tip">Rank-up triggers a full-screen ascension ceremony — petals, a golden shockwave, and the characters celebrating. You earned it.</div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-sec-head"><span class="info-sec-glyph">蝶</span><span class="info-sec-title">Collect — Silver Butterfly Gacha</span></div>
+      <div class="info-body">
+        Every task you check off and every habit you cultivate earns <strong>+1 🦋 Silver Butterfly</strong> (shown in the top-right corner). Head to the <strong>Collect tab</strong> to spend them on card draws.<br/><br/>
+        Cards come in three rarities:
+        <br/><br/>
+        <div class="info-row"><span class="itag blessing">Common</span> 62% — kanji symbol cards for TGCF characters & items.</div>
+        <div class="info-row"><span class="itag rare">Rare</span> 28% — illustrated scene cards from the series.</div>
+        <div class="info-row"><span class="itag legendary">Legendary</span> 10% — full art duo cards of Xie Lian & Hua Cheng.</div>
+        <br/>
+        There are 24 cards total to collect. Duplicate pulls give you <strong>+5 bonus SP</strong> instead.
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-sec-head"><span class="info-sec-glyph">人</span><span class="info-sec-title">Characters & Interactions</span></div>
+      <div class="info-body">
+        <strong>Xie Lian</strong> (white-robed, right side) is always present. <strong>Hua Cheng</strong> (red-haired, left) unlocks once you reach <strong>Spirit Cultivator</strong> rank (600 SP) — a reward for consistency.<br/><br/>
+        The characters react live to what you do: complete a Calamity and they celebrate; complete a habit and they cheer; leave the app idle for 30 seconds and one of them enters an idle pose with a thought bubble. <strong>Click either character</strong> to poke them. <strong>Click the speech bubble</strong> to cycle dialogue.
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-sec-head"><span class="info-sec-glyph">✦</span><span class="info-sec-title">Tips</span></div>
+      <div class="info-body">
+        <div class="info-row">— <span>Move your mouse for silver butterfly and parallax effects.</span></div>
+        <div class="info-row">— <span>The SP value on each task is editable — set it higher for things that actually take effort.</span></div>
+        <div class="info-row">— <span><strong>Done &gt; perfect.</strong> A rough edit posted beats a perfect edit sitting in drafts.</span></div>
+        <div class="info-row">— <span>Progress is saved automatically in your browser. Nothing is lost on refresh.</span></div>
+        <div class="info-row">— <span>Press <strong>Escape</strong> or click outside to close any overlay.</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ════════════════════════════════════
+   CANVAS — particles + lanterns
+   ════════════════════════════════════ */
+const canvas=document.getElementById('bg'),ctx=canvas.getContext('2d');
+let W,H;
+const mouse={x:-9999,y:-9999};
+let particles=[],lanterns=[],stars=[],butterTrail=[],shockwaves=[];
+function resizeCanvas(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;initStars();}
+window.addEventListener('resize',()=>{resizeCanvas();syncLanterns();});
+
+/* ── PARALLAX + CURSOR GLOW ── */
+const cglow=document.getElementById('cursor-glow');
+let _parRaf=null;
+document.addEventListener('mousemove',e=>{
+  mouse.x=e.clientX;mouse.y=e.clientY;
+  spawnButterfly(e.clientX,e.clientY);
+  // Cursor ambient glow
+  if(cglow){cglow.style.left=e.clientX+'px';cglow.style.top=e.clientY+'px';}
+  // Parallax
+  if(_parRaf)return;
+  _parRaf=requestAnimationFrame(()=>{
+    _parRaf=null;
+    const rx=(e.clientX/innerWidth-0.5),ry=(e.clientY/innerHeight-0.5);
+    document.documentElement.style.setProperty('--par-x',(rx*-16)+'px');
+    document.documentElement.style.setProperty('--par-y',(ry*-10)+'px');
+    const atmo=document.getElementById('atmo');
+    if(atmo)atmo.style.transform=`translate(${rx*26}px,${ry*16}px)`;
+  });
+});
+const PCOLS=[[245,192,64],[245,192,64],[232,144,26],[232,144,26],[255,245,200],[255,245,200],[184,40,64],[138,125,184]];
+function mkParticle(placed){
+  const isOrb=Math.random()<0.18,c=PCOLS[Math.floor(Math.random()*PCOLS.length)];
+  const r=isOrb?(10+Math.random()*18):(1.2+Math.random()*4.5);
+  return{x:placed?Math.random()*W:(Math.random()<0.5?-10:W+10),y:Math.random()*H,vx:(Math.random()-0.5)*0.20,vy:-(0.04+Math.random()*0.20),r,c,a:isOrb?(0.18+Math.random()*0.30):(0.05+Math.random()*0.44),ph:Math.random()*Math.PI*2,ps:0.003+Math.random()*0.010,orb:isOrb,ca:0};
+}
+function initParticles(){particles=Array.from({length:58},()=>mkParticle(true));}
+function tickParticles(){
+  particles.forEach(p=>{
+    const dx=p.x-mouse.x,dy=p.y-mouse.y,d2=dx*dx+dy*dy;
+    if(d2<32400){const d=Math.sqrt(d2)||1,f=(1-d/180)*0.60;p.vx+=(dx/d)*f*0.045;p.vy+=(dy/d)*f*0.045;}
+    p.vx*=0.974;p.vy*=0.974;const spd=Math.hypot(p.vx,p.vy);if(spd>1.3){p.vx*=1.3/spd;p.vy*=1.3/spd;}
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<-30)p.x=W+30;if(p.x>W+30)p.x=-30;
+    if(p.y<-30){p.y=H+30;p.x=Math.random()*W;}if(p.y>H+30){p.y=-30;p.x=Math.random()*W;}
+    p.ph+=p.ps;p.ca=p.a*(0.50+0.50*Math.sin(p.ph));
+  });
+}
+function drawParticles(){
+  particles.forEach(p=>{
+    const[r,g,b]=p.c;
+    if(p.orb){const rad=p.r*5,gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rad);gr.addColorStop(0,`rgba(${r},${g},${b},${p.ca})`);gr.addColorStop(0.30,`rgba(${r},${g},${b},${p.ca*0.32})`);gr.addColorStop(1,`rgba(${r},${g},${b},0)`);ctx.beginPath();ctx.arc(p.x,p.y,rad,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,p.r*0.40,0,Math.PI*2);ctx.fillStyle=`rgba(255,248,220,${Math.min(1,p.ca*1.3)})`;ctx.fill();}
+    else{const rad=p.r*3.8,gr=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rad);gr.addColorStop(0,`rgba(${r},${g},${b},${p.ca*0.88})`);gr.addColorStop(0.45,`rgba(${r},${g},${b},${p.ca*0.22})`);gr.addColorStop(1,`rgba(${r},${g},${b},0)`);ctx.beginPath();ctx.arc(p.x,p.y,rad,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();}
+  });
+}
+function mkLantern(placed){
+  return{x:placed?(0.08+Math.random()*0.84)*W:(Math.random()<0.5?-20:W+20),y:placed?Math.random()*H:H+30,vy:-(0.22+Math.random()*0.38),vx:(Math.random()-0.5)*0.10,sw:0,swSpd:0.006+Math.random()*0.010,swAmp:0.5+Math.random()*0.8,w:12+Math.random()*12,ph:Math.random()*Math.PI*2,ps:0.004+Math.random()*0.008,a:0.28+Math.random()*0.34,ca:0};
+}
+function targetLanternCount(){return Math.min(20,Math.floor((state?state.sp:0)/100)+3);}
+function syncLanterns(){const t=targetLanternCount();while(lanterns.length<t)lanterns.push(mkLantern(lanterns.length===0));while(lanterns.length>t)lanterns.shift();}
+function tickLanterns(){
+  lanterns.forEach(l=>{l.sw+=l.swSpd;l.x+=l.vx+Math.sin(l.sw)*l.swAmp*0.035;l.y+=l.vy;l.ph+=l.ps;l.ca=l.a*(0.58+0.42*Math.sin(l.ph));if(l.y<-50){l.y=H+20;l.x=(0.08+Math.random()*0.84)*W;l.vx=(Math.random()-0.5)*0.10;}if(l.x<-30)l.x=W+30;if(l.x>W+30)l.x=-30;});
+}
+function drawLanterns(){
+  lanterns.forEach(l=>{
+    const{x,y,w,ca}=l,h=w*1.45;ctx.save();ctx.globalAlpha=ca;
+    const gr=ctx.createRadialGradient(x,y,0,x,y,w*3.8);gr.addColorStop(0,`rgba(255,200,55,${ca*0.50})`);gr.addColorStop(0.5,`rgba(232,130,20,${ca*0.10})`);gr.addColorStop(1,`rgba(200,80,10,0)`);ctx.beginPath();ctx.arc(x,y,w*3.8,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+    ctx.beginPath();ctx.moveTo(x-w*0.40,y-h*0.36);ctx.lineTo(x+w*0.40,y-h*0.36);ctx.quadraticCurveTo(x+w*0.56,y,x+w*0.40,y+h*0.42);ctx.lineTo(x-w*0.40,y+h*0.42);ctx.quadraticCurveTo(x-w*0.56,y,x-w*0.40,y-h*0.36);ctx.closePath();
+    const bg=ctx.createRadialGradient(x,y-h*0.06,0,x,y,w*0.95);bg.addColorStop(0,'rgba(255,238,130,0.94)');bg.addColorStop(0.4,'rgba(248,168,38,0.84)');bg.addColorStop(1,'rgba(175,75,15,0.38)');ctx.fillStyle=bg;ctx.fill();
+    ctx.fillStyle=`rgba(180,115,35,${ca*0.78})`;ctx.fillRect(x-w*0.20,y-h*0.44,w*0.40,h*0.12);ctx.fillRect(x-w*0.18,y+h*0.38,w*0.36,h*0.10);
+    ctx.strokeStyle=`rgba(200,150,55,${ca*0.40})`;ctx.lineWidth=0.9;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(x+i*w*0.13,y+h*0.48);ctx.lineTo(x+i*w*0.13+Math.sin(l.sw+i)*1.8,y+h*0.67);ctx.stroke();}
+    ctx.restore();
+  });
+}
+function initStars(){
+  stars=Array.from({length:120},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:0.3+Math.random()*1.2,a:0.08+Math.random()*0.30,
+    ph:Math.random()*Math.PI*2,ps:0.004+Math.random()*0.008,ca:0
+  }));
+}
+function tickStars(){stars.forEach(s=>{s.ph+=s.ps;s.ca=s.a*(0.35+0.65*Math.sin(s.ph));});}
+function drawStars(){stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,245,220,${s.ca})`;ctx.fill();});}
+
+/* ── SILVER BUTTERFLY TRAIL ── */
+function spawnButterfly(x,y){
+  if(Math.random()>0.22)return;
+  butterTrail.push({x,y,vx:(Math.random()-0.5)*0.9,vy:-(0.5+Math.random()*0.9),life:1.0,decay:0.013+Math.random()*0.009,size:2.8+Math.random()*2.8,angle:(Math.random()-0.5)*1.2,flap:Math.random()*Math.PI*2,flapSpd:0.09+Math.random()*0.10,crimson:Math.random()<0.55});
+}
+function tickButterflies(){
+  butterTrail.forEach(b=>{b.x+=b.vx;b.y+=b.vy;b.vx*=0.97;b.vy*=0.97;b.flap+=b.flapSpd;b.life-=b.decay;});
+  butterTrail=butterTrail.filter(b=>b.life>0);
+}
+function drawButterflies(){
+  butterTrail.forEach(b=>{
+    const ca=Math.max(0,b.life),fw=Math.abs(Math.cos(b.flap));
+    ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.angle);ctx.globalAlpha=ca;
+    const col=b.crimson?`rgba(184,40,64,${ca})`:`rgba(210,170,220,${ca})`;
+    ctx.fillStyle=col;
+    ctx.beginPath();ctx.ellipse(-b.size*fw*0.55,0,b.size*fw+0.2,b.size*0.52,Math.PI*0.22,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse( b.size*fw*0.55,0,b.size*fw+0.2,b.size*0.52,-Math.PI*0.22,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=`rgba(50,10,20,${ca*0.7})`;ctx.beginPath();ctx.ellipse(0,0,1.0,b.size*0.35,0,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  });
+}
+
+/* ── RANK-UP SHOCKWAVE ── */
+function triggerShockwave(){
+  shockwaves.push({x:W/2,y:H/2,r:0,maxR:Math.hypot(W,H)*0.72,a:0.75});
+}
+function tickShockwaves(){
+  shockwaves.forEach(s=>{s.r+=16;s.a=0.75*(1-s.r/s.maxR);});
+  shockwaves=shockwaves.filter(s=>s.r<s.maxR);
+}
+function drawShockwaves(){
+  shockwaves.forEach(s=>{
+    ctx.save();
+    ctx.shadowColor='rgba(245,192,64,0.55)';ctx.shadowBlur=28;
+    ctx.strokeStyle=`rgba(245,192,64,${s.a})`;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle=`rgba(255,255,255,${s.a*0.32})`;ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r*0.82,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  });
+}
+
+function loop(){ctx.clearRect(0,0,W,H);tickStars();drawStars();tickButterflies();drawButterflies();tickParticles();tickLanterns();drawParticles();drawLanterns();tickShockwaves();drawShockwaves();requestAnimationFrame(loop);}
+
+/* ════════════════════════════════════
+   DATA
+   ════════════════════════════════════ */
+const QUOTES=["No matter what, just keep posting.","Even 800 years of bad luck couldn't stop me. One imperfect video is still a video posted.","One edit, one upload, one day at a time. The algorithm remembers the consistent.","San Lang always says gege works too hard. But the work continues, beautifully.","The heavens favor the patient, but the For You Page favors the persistent.","I once swept a temple for 200 years. Your editing queue is, comparatively, a kindness.","Ruoye binds what it must. So do you, when you press record.","The Three Calamities did not break me. A tough edit shall not break you.","Even a god must start somewhere. Post it. Fix it tomorrow.","Hua Cheng built Ghost City from nothing. You're building an audience, one video at a time.","Done is better than perfect. The heavens don't grade on aesthetics.","Gege, you posted again — the realm has taken note."];
+
+const IMG={
+  lanterns:"tgcf/WhatsApp Image 2026-05-26 at 20.38.59.jpeg",
+  together:"tgcf/WhatsApp Image 2026-05-26 at 20.38.59 (1).jpeg",
+  crimson: "tgcf/WhatsApp Image 2026-05-26 at 20.38.59 (2).jpeg",
+  autumn:  "tgcf/WhatsApp Image 2026-05-26 at 20.38.59 (3).jpeg",
+  release: "tgcf/WhatsApp Image 2026-05-26 at 20.39.30.jpeg",
+};
+
+/* ── STICKER COLLECTION ── */
+const STICKERS=[
+  /* ── COMMON (12) ── */
+  {id:'xl-broom',   rarity:'common', name:'The Holy Broom',       char:'谢怜',  sub:'800 years of sweeping',        bg:'linear-gradient(150deg,#14102a,#1e1840)', sym:'帚', clr:'#c8a8d8'},
+  {id:'hc-dice',    rarity:'common', name:'The Silver Die',        char:'花城',  sub:'Let fate decide',              bg:'linear-gradient(150deg,#1a0012,#300020)', sym:'骰', clr:'#e06070'},
+  {id:'xl-mantou',  rarity:'common', name:'One Steamed Bun',       char:'谢怜',  sub:'A feast for a prince',         bg:'linear-gradient(150deg,#1c1008,#2e1c10)', sym:'食', clr:'#d4a050'},
+  {id:'hc-btfly',   rarity:'common', name:'Silver Butterfly',      char:'花城',  sub:'His eyes and hands',           bg:'linear-gradient(150deg,#160018,#280030)', sym:'蝶', clr:'#b870c8'},
+  {id:'ruoye',      rarity:'common', name:'Ruoye',                  char:'绕野',  sub:'Faithful as a prayer',         bg:'linear-gradient(150deg,#0a1624,#142038)', sym:'绕', clr:'#6890b8'},
+  {id:'xl-tired',   rarity:'common', name:'800 Years Tired',       char:'谢怜',  sub:'Still going',                  bg:'linear-gradient(150deg,#10102c,#182248)', sym:'困', clr:'#9888c8'},
+  {id:'hc-smile',   rarity:'common', name:'San Lang Smiles',       char:'花城',  sub:'Dangerous',                    bg:'linear-gradient(150deg,#1c0008,#300010)', sym:'笑', clr:'#d85070'},
+  {id:'xl-pray',    rarity:'common', name:'A Small Prayer',        char:'谢怜',  sub:'Even one believer',            bg:'linear-gradient(150deg,#181028,#261840)', sym:'祈', clr:'#b098d0'},
+  {id:'hc-eye',     rarity:'common', name:'Crimson Rain Eye',      char:'花城',  sub:'Always watching',              bg:'linear-gradient(150deg,#1c0008,#2c0014)', sym:'目', clr:'#c02838'},
+  {id:'ling-wen',   rarity:'common', name:'Ling Wen',               char:'灵文',  sub:'The overworked',               bg:'linear-gradient(150deg,#101420,#1c2030)', sym:'文', clr:'#8090a8'},
+  {id:'sqx',        rarity:'common', name:'Wind Master',            char:'师青玄',sub:'Free as the wind',             bg:'linear-gradient(150deg,#081820,#103030)', sym:'风', clr:'#50a8b8'},
+  {id:'lang-qq',    rarity:'common', name:'Lang Qianqiu',           char:'郎千秋',sub:'Loyal sword',                  bg:'linear-gradient(150deg,#0c1808,#162010)', sym:'剑', clr:'#60a860'},
+  /* ── RARE (8) ── */
+  {id:'xl-regalia', rarity:'rare', name:'Crown Prince Regalia',    char:'谢怜',  sub:'God of Xianle',                img:IMG.lanterns, imgPos:'50% 35%'},
+  {id:'hc-gk',      rarity:'rare', name:'Ghost King',              char:'花城',  sub:'Crimson Rain Sought Flower',   img:IMG.crimson,  imgPos:'50% 28%'},
+  {id:'xl-lantern', rarity:'rare', name:'Lantern Release',         char:'谢怜',  sub:'A light in the dark',          img:IMG.release,  imgPos:'50% 30%'},
+  {id:'hc-protect', rarity:'rare', name:'I Will Stand Here',       char:'花城',  sub:'Steadfast, always',            img:IMG.crimson,  imgPos:'50% 55%'},
+  {id:'xl-hc-walk', rarity:'rare', name:'Walking Together',        char:'谢怜·花城',sub:'The long road',             img:IMG.together, imgPos:'50% 78%'},
+  {id:'autumn',     rarity:'rare', name:'Maple Season',            char:'谢怜·花城',sub:'Crowned in blossom',        img:IMG.autumn,   imgPos:'50% 35%'},
+  {id:'hc-horse',   rarity:'rare', name:'Stepping Into Wind',      char:'花城',  sub:'Lord of Ghost City',           img:IMG.crimson,  imgPos:'50% 15%'},
+  {id:'xl-sorrow',  rarity:'rare', name:'Beautiful Sorrow',        char:'谢怜',  sub:'Even this, beautiful',         img:IMG.together, imgPos:'50% 40%'},
+  /* ── LEGENDARY (4) ── */
+  {id:'hualian',    rarity:'legendary', name:'Ten Thousand Lanterns',   char:'花城·谢怜',sub:'For you, every light',          img:IMG.lanterns, imgPos:'50% 42%'},
+  {id:'crown',      rarity:'legendary', name:'The Crown Returned',      char:'花城·谢怜',sub:'As it always should have been',  img:IMG.together, imgPos:'50% 30%'},
+  {id:'sovereign',  rarity:'legendary', name:'Crown Prince, Sovereign', char:'仙乐太子', sub:'The realm bows',                img:IMG.release,  imgPos:'50% 20%'},
+  {id:'san-gege',   rarity:'legendary', name:'San Lang & Gege',         char:'花城·谢怜',sub:'Eight hundred years',           img:IMG.autumn,   imgPos:'50% 25%'},
+];
+
+/* Each beat: speaker = "xie_lian" | "hua_cheng" | "narrator" */
+const CHAPTERS=[
+  {
+    ri:0,ch:"Chapter I · 凡人",title:"The Wandering Prince",
+    img:IMG.together,imgPos:"50% 78%",
+    lines:["One step is enough.","The road is long. Begin anyway.","Even gods start somewhere.","Keep going. Just keep going."],
+    beats:[
+      {s:"narrator", t:"Eight hundred years of bad luck. Three ascensions and three falls. The heavens have long since forgotten the name of the Crown Prince of Xianle."},
+      {s:"narrator", t:"But he has not stopped."},
+      {s:"xie_lian", t:"The shrine is empty. It has been empty for a very long time."},
+      {s:"xie_lian", t:"But I am here now. And I have a broom."},
+      {s:"narrator", t:"He begins to sweep. Small work. Holy work. One step at a time."},
+      {s:"xie_lian", t:"One step is always enough to begin."},
+    ],
+  },
+  {
+    ri:1,ch:"Chapter II · 信徒",title:"First Prayers Answered",
+    img:IMG.lanterns,imgPos:"50% 35%",
+    lines:["Your effort has been noted.","A small blessing is still a blessing.","The heavens hear more than they let on.","Keep the faith."],
+    beats:[
+      {s:"narrator", t:"He has been walking three days without food when a child leaves a steamed bun at the crossroads altar. An offering. For him."},
+      {s:"xie_lian", t:"Someone prayed to me today. It was a small prayer. Barely a whisper."},
+      {s:"xie_lian", t:"But I heard it."},
+      {s:"narrator", t:"The heavens are slow to answer. They always have been. But they are not deaf."},
+      {s:"xie_lian", t:"If even one person believes — then I believe too. In myself. In the road. In what is still possible."},
+    ],
+  },
+  {
+    ri:2,ch:"Chapter III · 鬼影",title:"In the Rain, A Red Butterfly",
+    img:IMG.crimson,imgPos:"50% 28%",
+    lines:["Not all shadows mean harm.","San Lang is near.","Crimson. That colour again.","Something is beginning."],
+    beats:[
+      {s:"narrator", t:"It begins with a silver butterfly."},
+      {s:"xie_lian", t:"I've been followed. I'm certain of it now. Not threateningly — it's more like... a lantern, just out of sight."},
+      {s:"narrator", t:"The butterfly lands on his outstretched hand. It does not vanish. It waits."},
+      {s:"xie_lian", t:"Whoever you are — I'm not afraid. You can come out, if you wish."},
+      {s:"narrator", t:"Nothing comes out. Only the rain, and the faintest trace of blood-red flowers on the wind."},
+      {s:"xie_lian", t:"...I see."},
+    ],
+  },
+  {
+    ri:3,ch:"Chapter IV · 修士",title:"San Lang",
+    img:IMG.release,imgPos:"50% 28%",
+    lines:["San Lang smiles and says nothing.","We walk together now.","The lanterns rise because you made them.","I'm right here, gege."],
+    beats:[
+      {s:"hua_cheng", t:"Gege."},
+      {s:"xie_lian", t:"You've been following me."},
+      {s:"hua_cheng", t:"I heard a prayer. A god with no followers, on a mountain road in the rain, asking for nothing."},
+      {s:"xie_lian", t:"And you... came?"},
+      {s:"hua_cheng", t:"I came."},
+      {s:"narrator", t:"A silence settles between them — soft as lantern light, warm as amber, and absolutely impossible to explain."},
+    ],
+  },
+  {
+    ri:4,ch:"Chapter V · 天官",title:"The Heavens Return His Name",
+    img:IMG.lanterns,imgPos:"50% 50%",
+    lines:["A god again. As if he ever stopped being one.","The heavens called. I answered.","Three calamities, three ascensions.","San Lang was there for all of them."],
+    beats:[
+      {s:"narrator", t:"The celestial register opens. His name is written again, for the third time. The gods stare."},
+      {s:"xie_lian", t:"They're all staring."},
+      {s:"hua_cheng", t:"Let them stare, gege."},
+      {s:"xie_lian", t:"I didn't ascend for them. I never did."},
+      {s:"hua_cheng", t:"I know."},
+      {s:"hua_cheng", t:"That's exactly why it worked."},
+    ],
+  },
+  {
+    ri:5,ch:"Chapter VI · 武神",title:"They Walk Together",
+    img:IMG.crimson,imgPos:"50% 18%",
+    lines:["Strike true, gege.","We are unstoppable together.","Hua Cheng's dice land in your favour today.","San Lang says: very good, keep going."],
+    beats:[
+      {s:"narrator", t:"He strikes at procrastination the way he once struck the heavens — without hesitation, without fear of falling."},
+      {s:"hua_cheng", t:"You've been working hard again, gege."},
+      {s:"xie_lian", t:"I didn't hear you come in."},
+      {s:"hua_cheng", t:"You never do when you're focused."},
+      {s:"hua_cheng", t:"It's one of your better qualities."},
+      {s:"xie_lian", t:"Flatterer."},
+      {s:"hua_cheng", t:"...Mm."},
+    ],
+  },
+  {
+    ri:6,ch:"Chapter VII · 花冠武神",title:"Crowned in Blossom",
+    img:IMG.autumn,imgPos:"50% 35%",
+    lines:["In full bloom. As it was always meant to be.","Maple leaves and gold light. We've come far.","Even the seasons celebrate you now.","San Lang places a blossom in your hair."],
+    beats:[
+      {s:"narrator", t:"Maple leaves fall around them like red offerings. The Crown Prince of Xianle is in full bloom — power, patience, and devotion, everything that was taken, restored and then exceeded."},
+      {s:"xie_lian", t:"San Lang — a leaf landed in your hair."},
+      {s:"hua_cheng", t:"Gege is the only one who notices these things."},
+      {s:"xie_lian", t:"I notice everything about you."},
+      {s:"narrator", t:"A silence. The kind that needs no filling. The kind that only eight hundred years could build."},
+    ],
+  },
+  {
+    ri:7,ch:"Chapter VIII · 仙乐太子",title:"The Crown Prince, Sovereign at Last",
+    img:IMG.lanterns,imgPos:"50% 30%",
+    lines:["You have ascended. All of you.","The Ghost King built a city for you. You built this.","仙乐太子 · Sovereign.","San Lang says: gege, I told you so."],
+    beats:[
+      {s:"hua_cheng", t:"Gege."},
+      {s:"xie_lian", t:"Mm?"},
+      {s:"hua_cheng", t:"You built this. Everything you see."},
+      {s:"xie_lian", t:"We built this, San Lang."},
+      {s:"narrator", t:"Every lantern in the sky was earned. Every step forward, chosen. Every calamity — survived."},
+      {s:"hua_cheng", t:"I told you so."},
+      {s:"xie_lian", t:"You did. You always do."},
+      {s:"narrator", t:"And beside him, the Ghost King smiled, and said nothing more — because nothing more needed to be said."},
+    ],
+  },
+];
+
+const RANKS=[
+  {name:"Mortal Wanderer",           tier:"凡人 · Earthly Path",           threshold:0,    quote:"Every god began here. Walk on."},
+  {name:"Devoted Pilgrim",           tier:"信徒 · Path of Devotion",       threshold:100,  quote:"Your steps are noted by quiet heavens."},
+  {name:"Ghost-Touched",             tier:"鬼影 · Path of Shadows",        threshold:300,  quote:"You have walked through the dark and remembered the light."},
+  {name:"Spirit Cultivator",         tier:"修士 · Path of Cultivation",    threshold:600,  quote:"The breath of qi steadies in your chest."},
+  {name:"Heavenly Official",         tier:"天官 · Court of the Heavens",   threshold:1000, quote:"Your name has been recorded in the celestial register."},
+  {name:"Martial God of Diligence",  tier:"武神 · Path of the Sword",      threshold:1800, quote:"You strike at procrastination as Xie Lian struck the heavens."},
+  {name:"Flower-Crowned Martial God",tier:"花冠武神 · Crowned in Blossom", threshold:3000, quote:"A god whose every step blooms beneath them."},
+  {name:"Crown Prince of Xianle",    tier:"仙乐太子 · Sovereign",          threshold:5000, quote:"You have ascended. The realm bows to your discipline."},
+];
+
+const HABIT_STAGES=[
+  {name:"Seed",    min:0,  max:7,    color:"#5ec49a"},
+  {name:"Sprout",  min:8,  max:21,   color:"#b06880"},
+  {name:"Bloom",   min:22, max:66,   color:"#e8901a"},
+  {name:"Eternal", min:67, max:9999, color:"#f5c040"},
+];
+
+const KEY="xie-lian-tracker-v3";
+let state=loadState();
+function defaultState(){
+  return{sp:0,rankIdx:0,streakDays:0,lastActiveDate:null,butterflies:0,collection:[],shrines:[{id:"default",name:"My Quests"}],activeShrine:"default",
+    tasks:[],
+    habits:[{id:gid(),title:"Edit & post today's video",sp:30,streak:0,lastDone:null,created:now()}],
+    journal:[]};
+}
+function loadState(){try{const r=localStorage.getItem(KEY);if(!r)return defaultState();return Object.assign(defaultState(),JSON.parse(r));}catch(e){return defaultState();}}
+function saveState(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function gid(){return"id-"+Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
+function now(){return Date.now();}
+function todayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+
+/* ── BACKGROUND SWITCHING ── */
+const BG_MAP={overview:'bgs-overview',tasks:'bgs-tasks',habits:'bgs-overview',journal:'bgs-overview',collection:'bgs-overview'};
+function switchBg(s){Object.entries(BG_MAP).forEach(([k,id])=>document.getElementById(id).classList.toggle('active',k===s));}
+
+/* ── SCENE TRANSITIONS ── */
+let currentScene='overview';
+function goScene(id){
+  if(id===currentScene)return;
+  const prev=document.getElementById('sc-'+currentScene),next=document.getElementById('sc-'+id);
+  if(!next)return;
+  prev.classList.add('exit');switchBg(id);
+  setTimeout(()=>{prev.classList.remove('active','exit');next.classList.add('active');currentScene=id;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.sc===id));
+    // Scene-contextual chibi poses
+    if(id==='journal'){chibSet('hc','write');}
+    else if(id==='collection'){chibSet('xl','happy',3500);chibSet('hc','flower',3500);}
+    else if(id==='tasks'){const pending=state.tasks.filter(t=>!t.done).length;if(pending>6)chibSet('xl','worried',4000);}
+    else{chibSet('xl','default');chibSet('hc','default');}
+    render();},320);
+}
+document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>goScene(b.dataset.sc));
+
+/* ════════════════════════════════════
+   CHIBI REACTIVE SPRITE SYSTEM
+   ════════════════════════════════════ */
+const SP='tgcf sticker sprite/';
+const CHIBI={
+  xl:{
+    default: SP+'xie_lian_default-removebg-preview.png',
+    happy:   SP+'xie_happy-removebg-preview.png',
+    worried: SP+'xie_worried-removebg-preview.png',
+    ded:     SP+'xie_ded-removebg-preview.png',
+    eat:     SP+'xie_eat-removebg-preview.png',
+    laying:  SP+'xie_laying-removebg-preview.png',
+  },
+  hc:{
+    default: SP+'hua_default-removebg-preview.png',
+    hi:      SP+'hua_hi-removebg-preview.png',
+    flower:  SP+'hua_flower-removebg-preview.png',
+    ring:    SP+'hua_ring-removebg-preview.png',
+    sleep:   SP+'hua_sleep-removebg-preview.png',
+    watch:   SP+'hua_watch-removebg-preview.png',
+    write:   SP+'hua_write-removebg-preview.png',
+    yawn:    SP+'hua_yawn-removebg-preview.png',
+    eat:     SP+'hua_eat-removebg-preview.png',
+  }
+};
+// Preload all sprites
+[...Object.values(CHIBI.xl),...Object.values(CHIBI.hc)].forEach(src=>{const i=new Image();i.src=src;});
+
+const _chibTimers={xl:null,hc:null};
+
+function chibSet(who,pose,dur=0){
+  const el=document.getElementById('chibi-'+who);
+  const src=(who==='xl'?CHIBI.xl:CHIBI.hc)[pose];
+  if(el&&src)el.src=src;
+  if(dur>0){if(_chibTimers[who])clearTimeout(_chibTimers[who]);_chibTimers[who]=setTimeout(()=>chibSet(who,'default'),dur);}
+}
+
+function chibReact(who,pose,anim,dur=2600){
+  chibSet(who,pose,dur);
+  const wrap=document.getElementById('wrap-'+who);
+  if(!wrap||wrap.classList.contains('c-hidden'))return;
+  const cls='r-'+anim;
+  wrap.classList.remove('r-bounce','r-happy','r-excited','r-poke','r-nod');
+  void wrap.offsetWidth;
+  wrap.classList.add(cls);
+  setTimeout(()=>wrap.classList.remove(cls),950);
+}
+
+function chibPoke(who){
+  if(who==='xl')chibReact('xl','worried','poke',1600);
+  else chibReact('hc','yawn','poke',2200);
+}
+
+function syncChibiVisibility(){
+  const wrap=document.getElementById('wrap-hc');
+  if(wrap)wrap.classList.toggle('c-hidden',state.rankIdx<3);
+}
+
+// Click: poke chibis, cycle bubble
+document.getElementById('wrap-hc').addEventListener('click',e=>{e.stopPropagation();chibPoke('hc');});
+document.getElementById('wrap-xl').addEventListener('click',e=>{e.stopPropagation();chibPoke('xl');});
+document.getElementById('char-bubble').addEventListener('click',e=>{e.stopPropagation();cycleDialogue();});
+
+/* ── COMPANION / CHAPTER ── */
+let dialogueIdx=0;
+function getChapter(ri){let c=CHAPTERS[0];for(const ch of CHAPTERS){if(ri>=ch.ri)c=ch;}return c;}
+function renderCompanion(){
+  const ch=getChapter(state.rankIdx);
+  const nn=document.getElementById('ch-num'),nt=document.getElementById('ch-title');
+  if(nn)nn.textContent=ch.ch;if(nt)nt.textContent=ch.title;
+  const bt=document.getElementById('bubble-text');
+  if(bt)bt.textContent=ch.lines[dialogueIdx%ch.lines.length];
+  syncChibiVisibility();
+}
+function cycleDialogue(){
+  const ch=getChapter(state.rankIdx);dialogueIdx=(dialogueIdx+1)%ch.lines.length;
+  const bt=document.getElementById('bubble-text');if(!bt)return;
+  bt.style.opacity='0';setTimeout(()=>{bt.textContent=ch.lines[dialogueIdx];bt.style.opacity='1';},280);
+}
+
+/* ── QUOTE ── */
+let quoteIdx=0;
+function nextQuote(){quoteIdx=(quoteIdx+1)%QUOTES.length;const el=document.getElementById('ov-quote');if(!el)return;el.style.opacity='0';setTimeout(()=>{el.textContent=QUOTES[quoteIdx];el.style.opacity='1';},450);}
+document.getElementById('ov-quote').style.transition='opacity 0.45s';
+
+/* ── RANK ── */
+function currentRankIdx(){let i=0;for(let k=0;k<RANKS.length;k++){if(state.sp>=RANKS[k].threshold)i=k;}return i;}
+function checkRankUp(){
+  const n=currentRankIdx();
+  if(n>state.rankIdx){
+    state.rankIdx=n;const r=RANKS[n];
+    document.getElementById('ru-name').textContent=r.name;
+    document.getElementById('ru-quote').textContent='「 '+r.quote+' 」';
+    const ch=getChapter(n);
+    const art=document.getElementById('ru-art');art.src=ch.img;art.style.objectPosition=ch.imgPos||'center';
+    document.getElementById('rankup-overlay').classList.add('show');
+    triggerPetals(false);triggerShockwave();renderCompanion();syncLanterns();
+    chibReact('xl','happy','excited',5000);
+    if(state.rankIdx>=3)chibReact('hc','flower','excited',5000);
+  }
+}
+
+/* ── STREAK ── */
+function bumpStreak(){const today=todayKey();if(state.lastActiveDate===today)return;const y=new Date();y.setDate(y.getDate()-1);const yk=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");state.streakDays=(state.lastActiveDate===yk)?(state.streakDays||0)+1:1;state.lastActiveDate=today;}
+
+/* ── RENDER ── */
+function render(){
+  const rank=RANKS[state.rankIdx],next=RANKS[state.rankIdx+1]||null;
+  document.getElementById('sb-rank').textContent=rank.name;document.getElementById('sb-sp').textContent=state.sp.toLocaleString()+' SP';
+  document.getElementById('ov-rank').textContent=rank.name;document.getElementById('ov-tier').textContent=rank.tier;
+  document.getElementById('ov-sp').textContent=state.sp.toLocaleString();
+  document.getElementById('ov-streak').textContent=state.streakDays||0;
+  document.getElementById('ov-cleared').textContent=state.tasks.filter(t=>t.done).length;
+  document.getElementById('ov-prog-cur').textContent=rank.name.split(' ').pop();
+  document.getElementById('ov-prog-nxt').textContent=next?next.name.split(' ').pop():'Max';
+  const fill=document.getElementById('ov-fill'),meta=document.getElementById('ov-prog-meta');
+  if(next){const span=next.threshold-rank.threshold,have=state.sp-rank.threshold;const pct=Math.min(100,Math.max(0,(have/span)*100));fill.style.width=pct+'%';meta.textContent=(next.threshold-state.sp)+' SP until '+next.name;document.getElementById('xp-bar').style.width=pct+'%';}
+  else{fill.style.width='100%';meta.textContent='You have reached the highest rank.';document.getElementById('xp-bar').style.width='100%';}
+  // Tasks (all, no shrine filter)
+  const tl=document.getElementById('taskList');if(tl){tl.innerHTML='';
+  const tasks=state.tasks;
+  if(!tasks.length){tl.innerHTML=`<div class="empty"><span class="empty-glyph">無</span>No quests yet.<br/>Add your first task above to begin earning SP.</div>`;}
+  else{const tr={calamity:0,trial:1,blessing:2};tasks.sort((a,b)=>a.done!==b.done?a.done-b.done:tr[a.tier]-tr[b.tier]||a.created-b.created);tasks.forEach(t=>tl.appendChild(makeTask(t)));}}
+  // Habits on home tab
+  const hh=document.getElementById('ov-habits-home');if(hh){hh.innerHTML='';
+  if(state.habits.length){hh.innerHTML=`<div class="ov-section-lbl">daily · 今日修行</div>`;state.habits.forEach(h=>{const pill=document.createElement('div');pill.className='habit-pill';const doneToday=h.lastDone===todayKey();const stage=HABIT_STAGES.find(s=>h.streak>=s.min&&h.streak<=s.max)||HABIT_STAGES[0];pill.innerHTML=`<div><div class="habit-pill-name">${esc(h.title)}</div><div style="font-size:9px;color:var(--lbl);margin-top:2px;letter-spacing:0.12em;text-transform:uppercase;">${stage.name} · +${h.sp} SP</div></div><div style="text-align:center"><div class="habit-pill-streak">${h.streak}</div><div class="habit-pill-slbl">day${h.streak!==1?'s':''}</div></div><button class="btn-cult-pill ${doneToday?'done':''}" ${doneToday?'disabled':''}>${doneToday?'✓ Done':'Do it'}</button>`;if(!doneToday)pill.querySelector('.btn-cult-pill').onclick=e=>cultivateHabit(h.id,e);hh.appendChild(pill);});}
+  else{hh.innerHTML=`<div class="ov-section-lbl">daily · 今日修行</div><div class="habit-pill-empty">No habits yet — add one in Quests to track your daily edit streak.</div>`;}}
+  // Habits on habits tab (if it exists)
+  const hl=document.getElementById('habitList');if(hl){hl.innerHTML='';
+  if(!state.habits.length){hl.innerHTML=`<div class="empty"><span class="empty-glyph">禅</span>No habits yet.</div>`;}
+  else{state.habits.forEach(h=>hl.appendChild(makeHabit(h)));}}
+  // Recent log on home tab (last 4 entries)
+  const rv=document.getElementById('ov-recent');if(rv){rv.innerHTML='';
+  const recent=state.journal.slice(-4).reverse();if(recent.length){rv.innerHTML=`<div class="ov-section-lbl">recent · 近事</div>`;recent.forEach(j=>{const e=document.createElement('div');e.className='ov-recent-entry';e.innerHTML=`<span>${esc(j.text)}</span><span class="ov-recent-sp">+${j.sp} SP</span>`;rv.appendChild(e);});}}
+  // Journal tab (if it exists)
+  const js=document.getElementById('journalScroll');if(js){js.innerHTML='';
+  if(!state.journal.length){js.innerHTML=`<div class="empty"><span class="empty-glyph">空</span>The scroll is blank — for now.</div>`;}
+  else{state.journal.slice().reverse().forEach(j=>{const d=new Date(j.t),ds=d.toLocaleDateString()+' · '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});const e=document.createElement('div');e.className='j-entry';e.innerHTML=`<div class="j-text">${esc(j.text)}</div><div class="j-right"><div class="j-sp">+${j.sp} SP</div><div class="j-date">${ds}</div></div>`;js.appendChild(e);});}}
+  renderCompanion();syncLanterns();
+  const bf=state.butterflies||0;
+  const sbBf=document.getElementById('sb-bf');if(sbBf)sbBf.style.display=bf>0?'flex':'none';
+  const sbBfN=document.getElementById('sb-bf-n');if(sbBfN)sbBfN.textContent=bf;
+  renderCollection();
+}
+
+function makeTask(t){
+  const row=document.createElement('div');row.className='task '+t.tier+(t.done?' done':'');
+  row.innerHTML=`<div class="check ${t.done?'checked':''}" title="Complete"></div><div class="task-info"><div class="task-name">${esc(t.title)}</div><div class="task-date">Added ${new Date(t.created).toLocaleDateString()}</div></div><span class="tier-tag ${t.tier}">${tierLbl(t.tier)}</span><span class="sp-tag">${t.sp}</span><button class="del-btn" title="Banish">×</button>`;
+  row.querySelector('.check').onclick=e=>toggleTask(t.id,e);row.querySelector('.del-btn').onclick=()=>deleteTask(t.id);return row;
+}
+function tierLbl(t){return t==='calamity'?'Calamity':t==='trial'?'Trial':'Blessing';}
+function makeHabit(h){
+  const row=document.createElement('div');row.className='habit';
+  const stage=HABIT_STAGES.find(s=>h.streak>=s.min&&h.streak<=s.max)||HABIT_STAGES[0];
+  const doneToday=h.lastDone===todayKey();
+  let flames='';const lit=Math.min(7,h.streak);
+  for(let i=0;i<7;i++)flames+=`<span class="fl ${i<lit?'lit':''}" style="${i<lit?'color:'+stage.color:''}">${i<lit?'✦':'✧'}</span>`;
+  row.innerHTML=`<div><div class="habit-name">${esc(h.title)}</div><div class="habit-stage">Stage: ${stage.name} · +${h.sp} SP/day</div></div><div class="flames">${flames}</div><div class="streak-val">${h.streak}</div><button class="cult-btn ${doneToday?'done-today':''}" ${doneToday?'disabled':''}>${doneToday?'✓ Cultivated':'Cultivate'}</button>`;
+  if(!doneToday)row.querySelector('.cult-btn').onclick=e=>cultivateHabit(h.id,e);
+  row.oncontextmenu=e=>{e.preventDefault();if(confirm("Banish habit '"+h.title+"'?"))deleteHabit(h.id);};return row;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]);}
+
+/* ── ACTIONS ── */
+function addTask(){const te=document.getElementById('newTaskTitle'),tr=document.getElementById('newTaskTier'),ts=document.getElementById('newTaskSP');const title=te.value.trim();if(!title){toast('Empty intentions yield no merit.','A title is required.');return;}state.tasks.push({id:gid(),shrine:'default',title,tier:tr.value,sp:Math.max(1,Math.min(999,parseInt(ts.value)||20)),done:false,created:now()});te.value='';saveState();render();toast('Quest added.','「 '+title+' 」 awaits.');}
+function toggleTask(id,evt){
+  const t=state.tasks.find(x=>x.id===id);if(!t)return;
+  if(t.done){t.done=false;state.sp=Math.max(0,state.sp-t.sp);for(let i=state.journal.length-1;i>=0;i--){if(state.journal[i].taskId===id){state.journal.splice(i,1);break;}}}
+  else{t.done=true;state.sp+=t.sp;state.butterflies=(state.butterflies||0)+1;state.journal.push({t:now(),text:'Cleared: '+t.title+' ('+tierLbl(t.tier)+')',sp:t.sp,taskId:id});bumpStreak();burst(evt,t.tier==='calamity');triggerPetals(t.tier==='calamity');toast('+'+t.sp+' SP  ·  🦋 ×1',pickMsg(t.tier));checkRankUp();cycleDialogue();
+    if(t.tier==='calamity'){chibReact('xl','happy','happy',3000);chibReact('hc','watch','bounce',3000);}
+    else if(t.tier==='trial'){chibReact('xl','happy','bounce',2600);chibReact('hc','hi','nod',2600);}
+    else{chibReact('xl','happy','nod',2200);}
+  }
+  saveState();render();
+}
+function pickMsg(tier){const m={calamity:["You cleared a Calamity. Hua Cheng would approve.","Three Calamities once nearly broke a Crown Prince. You just bested one of yours.","Even the Ghost King pauses to admire that."],trial:["A trial endured is a step toward ascension.","Even San Lang would smile at this progress.","The shrine grows stronger by your hand."],blessing:["A small blessing — but the gods favor consistency.","Even sweeping the floor is a holy act, gege.","One brick added. The shrine stands taller."]};const a=m[tier]||m.blessing;return a[Math.floor(Math.random()*a.length)];}
+function deleteTask(id){const t=state.tasks.find(x=>x.id===id);if(!t)return;if(!confirm("Banish task '"+t.title+"'?"))return;state.tasks=state.tasks.filter(x=>x.id!==id);saveState();render();}
+function addShrine(){const el=document.getElementById('newShrine');const name=el.value.trim();if(!name)return;const id='shrine-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+Math.random().toString(36).slice(2,6);state.shrines.push({id,name});state.activeShrine=id;el.value='';saveState();render();toast('Shrine erected.','「 '+name+' 」 now stands among the others.');}
+function removeShrine(id){if(state.shrines.length<=1){toast('Cannot banish.','At least one shrine must remain standing.');return;}const s=state.shrines.find(x=>x.id===id);if(!s)return;const tc=state.tasks.filter(t=>t.shrine===id).length;if(!confirm("Banish shrine '"+s.name+"'?"+(tc?' '+tc+' task(s) will be removed.':'')))return;state.shrines=state.shrines.filter(x=>x.id!==id);state.tasks=state.tasks.filter(t=>t.shrine!==id);if(state.activeShrine===id)state.activeShrine=state.shrines[0].id;saveState();render();}
+function addHabit(){const te=document.getElementById('newHabitTitle'),ts=document.getElementById('newHabitSP');const title=te.value.trim();if(!title)return;state.habits.push({id:gid(),title,sp:Math.max(1,Math.min(99,parseInt(ts.value)||10)),streak:0,lastDone:null,created:now()});te.value='';saveState();render();toast('Habit planted.','「 '+title+' 」 — Seed stage begins.');}
+function cultivateHabit(id,evt){const h=state.habits.find(x=>x.id===id);if(!h)return;const today=todayKey();if(h.lastDone===today)return;const y=new Date();y.setDate(y.getDate()-1);const yk=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');h.streak=(h.lastDone===yk)?h.streak+1:1;h.lastDone=today;state.sp+=h.sp;state.butterflies=(state.butterflies||0)+1;bumpStreak();chibReact('xl','happy','bounce',2500);chibReact('hc','hi','nod',2500);state.journal.push({t:now(),text:'Cultivated: '+h.title+' (Day '+h.streak+')',sp:h.sp});burst(evt,false);const ns=HABIT_STAGES.find(s=>h.streak>=s.min&&h.streak<=s.max);if(ns&&h.streak===ns.min&&ns.name!=='Seed')toast('Cultivation Stage: '+ns.name,'「 '+h.title+' 」 has reached '+ns.name+'.');else toast('+'+h.sp+' SP','Day '+h.streak+' of 「 '+h.title+' 」. Cultivation deepens.');checkRankUp();cycleDialogue();saveState();render();}
+function deleteHabit(id){state.habits=state.habits.filter(h=>h.id!==id);saveState();render();}
+
+/* ── EFFECTS ── */
+function burst(evt,crimson=false){
+  if(!evt)return;const x=evt.clientX,y=evt.clientY;
+  for(let i=0;i<16;i++){const s=document.createElement('div');s.className='sparkle'+(crimson?' red':'');const ang=(Math.PI*2*i)/16,dist=38+Math.random()*48;s.style.left=x+'px';s.style.top=y+'px';s.style.setProperty('--dx',Math.cos(ang)*dist+'px');s.style.setProperty('--dy',Math.sin(ang)*dist+'px');document.body.appendChild(s);setTimeout(()=>s.remove(),950);}
+  for(let i=0;i<4;i++){const p=mkParticle(false);p.x=x+(Math.random()-0.5)*30;p.y=y+(Math.random()-0.5)*30;p.vx=(Math.random()-0.5)*2;p.vy=-(1+Math.random()*2);p.a=0.7;p.orb=true;p.r=6+Math.random()*8;p.c=crimson?[184,40,64]:[245,192,64];particles.push(p);if(particles.length>72)particles.shift();}
+}
+function triggerPetals(crimson=false){
+  const n=crimson?26:16;
+  for(let i=0;i<n;i++){const p=document.createElement('div');p.className='petal';if(crimson)p.style.cssText+='background:rgba(184,40,64,0.68);width:6px;height:9px;';else p.style.background=`rgba(${220+Math.random()*35|0},${170+Math.random()*30|0},${185+Math.random()*30|0},0.78)`;p.style.left=(8+Math.random()*84)+'vw';p.style.top='-14px';p.style.setProperty('--dur',(2.4+Math.random()*2.2)+'s');p.style.setProperty('--dly',(Math.random()*1.4)+'s');p.style.setProperty('--rot',(Math.random()*360)+'deg');p.style.setProperty('--sx',(Math.random()<0.5?-1:1)*(18+Math.random()*55)+'px');p.style.setProperty('--fall',(280+Math.random()*380)+'px');p.style.setProperty('--mid',(90+Math.random()*190)+'px');document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}
+}
+function toast(title,body){const wrap=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast';t.innerHTML=`<div class="toast-title">${esc(title)}</div><div>${esc(body)}</div>`;wrap.appendChild(t);setTimeout(()=>t.remove(),5200);}
+
+document.getElementById('newTaskTitle').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+document.getElementById('newHabitTitle').addEventListener('keydown',e=>{if(e.key==='Enter')addHabit();});
+
+/* ════════════════════════════════════
+   GACHA ENGINE
+   ════════════════════════════════════ */
+function doPull(){
+  if((state.butterflies||0)<1){toast('No Silver Butterflies','Complete tasks and habits to earn 🦋 butterflies.');return;}
+  state.butterflies--;
+  const st=rollSticker();
+  const isNew=!(state.collection||[]).includes(st.id);
+  if(isNew){if(!state.collection)state.collection=[];state.collection.push(st.id);}
+  else{state.sp+=5;state.journal.push({t:now(),text:'Duplicate: '+st.name+' (sticker)',sp:5});}
+  saveState();showPull(st,isNew);render();
+}
+
+function rollSticker(){
+  const r=Math.random();
+  let pool;
+  if(r<0.10)pool=STICKERS.filter(s=>s.rarity==='legendary');
+  else if(r<0.38)pool=STICKERS.filter(s=>s.rarity==='rare');
+  else pool=STICKERS.filter(s=>s.rarity==='common');
+  if(!pool.length)pool=STICKERS;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function showPull(st,isNew){
+  const card=document.getElementById('pull-card');
+  card.classList.remove('flipped');
+  void card.offsetWidth;
+
+  // Set up front face
+  const hasBg=!!st.img;
+  const pfBg=document.getElementById('pf-bg');
+  const pfSym=document.getElementById('pf-sym');
+  if(hasBg){pfBg.style.backgroundImage=`url('${st.img}')`;pfBg.style.backgroundPosition=st.imgPos||'center';pfSym.style.display='none';}
+  else{pfBg.style.backgroundImage=st.bg||'none';pfBg.style.filter='none';pfSym.textContent=st.sym||'';pfSym.style.color=st.clr||'var(--ivory)';pfSym.style.display='block';}
+  const rarCol={common:'#c8b490',rare:'#6490f0',legendary:'#f5c040'};
+  const rEl=document.getElementById('pf-rarity');rEl.textContent=st.rarity.toUpperCase();rEl.style.color=rarCol[st.rarity];
+  document.getElementById('pf-name').textContent=st.name;
+  document.getElementById('pf-char').textContent=st.char;
+  const badge=document.getElementById('pf-badge');
+  badge.textContent=isNew?'✦  NEW':'· duplicate · +5 SP';
+  badge.style.color=isNew?'var(--jade)':'var(--lbl)';
+
+  document.getElementById('pull-ov').classList.add('open');
+  setTimeout(()=>{card.classList.add('flipped');setTimeout(()=>flashRarity(st.rarity,isNew),380);},560);
+}
+
+function flashRarity(rarity,isNew){
+  const flash=document.getElementById('pull-flash');
+  const c={common:'rgba(200,180,130,0.12)',rare:'rgba(80,130,255,0.15)',legendary:'rgba(245,192,64,0.20)'};
+  flash.style.background=c[rarity];flash.style.opacity='1';
+  setTimeout(()=>flash.style.opacity='0',320);
+  if(rarity==='legendary'){triggerPetals(false);chibReact('xl','happy','excited',5000);if(state.rankIdx>=3)chibReact('hc','ring','excited',5000);}
+  else if(rarity==='rare'&&isNew){triggerPetals(false);chibReact('xl','happy','happy',3000);if(state.rankIdx>=3)chibReact('hc','hi','bounce',3000);}
+  else if(isNew){chibReact('xl','happy','nod',2000);}
+}
+
+function closePull(){
+  document.getElementById('pull-ov').classList.remove('open');
+  document.getElementById('pull-card').classList.remove('flipped');
+  renderCollection();
+}
+document.getElementById('pull-ov').addEventListener('click',closePull);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('pull-ov').classList.contains('open')){e.preventDefault();closePull();}});
+
+function renderCollection(){
+  const grid=document.getElementById('coll-grid');if(!grid)return;
+  const owned=new Set(state.collection||[]);
+  const bf=state.butterflies||0;
+  const bfEl=document.getElementById('gacha-bf-n');if(bfEl)bfEl.textContent=bf;
+  const btn=document.getElementById('btn-gacha');if(btn)btn.disabled=bf<1;
+  const hint=document.getElementById('gacha-hint');
+  if(hint)hint.textContent=bf<1?'Complete tasks & habits to earn 🦋 Silver Butterflies':'Spend a butterfly to draw a sticker — good luck 🦋';
+  const prog=document.getElementById('gacha-prog');
+  if(prog){
+    const leg=STICKERS.filter(s=>s.rarity==='legendary'&&owned.has(s.id)).length;
+    const rare=STICKERS.filter(s=>s.rarity==='rare'&&owned.has(s.id)).length;
+    const com=STICKERS.filter(s=>s.rarity==='common'&&owned.has(s.id)).length;
+    prog.innerHTML=`Collection: <span class="g">${owned.size}</span> / ${STICKERS.length} &nbsp;·&nbsp; <span class="g">${leg}</span> legendary &nbsp;·&nbsp; <span class="b">${rare}</span> rare &nbsp;·&nbsp; ${com} common`;
+  }
+  grid.innerHTML='';
+  STICKERS.forEach(st=>{
+    const isOwned=owned.has(st.id);
+    const card=document.createElement('div');
+    card.className='s-card '+st.rarity+(isOwned?'':' locked');
+    let inner='';
+    if(st.img){inner+=`<div class="s-img" style="background-image:url('${st.img}');background-position:${st.imgPos||'center'}"></div>`;}
+    else{inner+=`<div class="s-grad" style="background:${st.bg}"></div><div class="s-sym" style="color:${st.clr||'#fff'}">${st.sym}</div>`;}
+    const dots=st.rarity==='legendary'?3:st.rarity==='rare'?2:1;
+    inner+=`<div class="s-foot"><span class="s-char">${isOwned?esc(st.char):'???'}</span><span class="s-name">${isOwned?esc(st.name):'Unknown'}</span><div class="s-dots">${'<span></span>'.repeat(dots)}</div></div>`;
+    card.innerHTML=inner;
+    grid.appendChild(card);
+  });
+}
+
+/* ── BOOT ── */
+resizeCanvas();
+initParticles();
+state.rankIdx=currentRankIdx();
+saveState();
+syncLanterns();
+loop();
+render();
+quoteIdx=Math.floor(Math.random()*QUOTES.length);
+document.getElementById('ov-quote').textContent=QUOTES[quoteIdx];
+setInterval(nextQuote,22000);
+switchBg('overview');
+
+/* ── INFO TUTORIAL ── */
+function toggleInfo(){document.getElementById('info-ov').classList.toggle('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const io=document.getElementById('info-ov');if(io.classList.contains('open')){e.preventDefault();io.classList.remove('open');}}});
+
+/* ── IDLE FIDGET ── */
+let _lastActivity=Date.now(),_idleFired=false;
+['mousemove','keydown','click','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{_lastActivity=Date.now();_idleFired=false;},{passive:true}));
+const _IDLE_XL=[['eat',"Mn... rice."],['laying',"Just five more minutes..."],['worried',"That stack of tasks isn't getting smaller."],['eat',"Food first, tasks second."]];
+const _IDLE_HC=[['yawn',"*yawns elegantly*"],['watch',"I'm watching you. Work harder."],['sleep',"...zz"],['eat',"Gege, you haven't eaten."]];
+setInterval(()=>{
+  if(Date.now()-_lastActivity<30000||_idleFired)return;
+  _idleFired=true;
+  const useHC=state.rankIdx>=3&&Math.random()>0.38;
+  const who=useHC?'hc':'xl';
+  const pool=useHC?_IDLE_HC:_IDLE_XL;
+  const[pose,thought]=pool[Math.floor(Math.random()*pool.length)];
+  chibReact(who,pose,'bounce',4200);
+  const bt=document.getElementById('bubble-text');
+  if(bt){bt.style.opacity='0';setTimeout(()=>{bt.textContent=thought;bt.style.opacity='1';},280);
+    setTimeout(()=>{const ch=getChapter(state.rankIdx);bt.style.opacity='0';setTimeout(()=>{bt.textContent=ch.lines[dialogueIdx%ch.lines.length];bt.style.opacity='1';},280);},5000);}
+},4000);
+</script>
+</body>
+</html>
