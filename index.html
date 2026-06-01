@@ -272,7 +272,9 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 .coll-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(106px,1fr));gap:12px;}
 .s-card{border-radius:11px;aspect-ratio:3/4;position:relative;overflow:hidden;cursor:pointer;transition:transform 0.28s,box-shadow 0.28s;user-select:none;}
 .s-card:hover:not(.locked){transform:translateY(-5px) scale(1.04);}
-.s-card.locked{filter:grayscale(1) brightness(0.22);cursor:default;}
+.s-card.locked{cursor:default;}
+.s-mystery{position:absolute;inset:0;background:linear-gradient(150deg,#08041a,#120828);display:flex;align-items:center;justify-content:center;}
+.s-mystery-sym{font-family:'Noto Serif SC',serif;font-size:52px;color:rgba(138,110,200,0.18);user-select:none;}
 .s-card.common{box-shadow:0 2px 10px rgba(0,0,0,0.58),0 0 0 1px rgba(190,170,130,0.20);}
 .s-card.rare{box-shadow:0 3px 16px rgba(80,120,255,0.20),0 0 0 1px rgba(100,140,240,0.40);}
 .s-card.legendary{box-shadow:0 4px 22px rgba(245,192,64,0.36),0 0 0 1.5px rgba(245,192,64,0.58);animation:legendGlow 3s ease-in-out infinite alternate;}
@@ -594,7 +596,7 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
         <div class="info-row"><span class="itag rare">Rare</span> 28% — illustrated scene cards from the series.</div>
         <div class="info-row"><span class="itag legendary">Legendary</span> 10% — full art duo cards of Xie Lian & Hua Cheng.</div>
         <br/>
-        There are 24 cards total to collect. Duplicate pulls give you <strong>+5 bonus SP</strong> instead.
+        There are 74 cards total to collect. Duplicate pulls give you <strong>+5 bonus SP</strong> instead.
       </div>
     </div>
 
@@ -765,33 +767,85 @@ const IMG={
 
 /* ── STICKER COLLECTION ── */
 const STICKERS=[
-  /* ── COMMON (12) ── */
-  {id:'xl-broom',   rarity:'common', name:'The Holy Broom',       char:'谢怜',  sub:'800 years of sweeping',        bg:'linear-gradient(150deg,#14102a,#1e1840)', sym:'帚', clr:'#c8a8d8'},
-  {id:'hc-dice',    rarity:'common', name:'The Silver Die',        char:'花城',  sub:'Let fate decide',              bg:'linear-gradient(150deg,#1a0012,#300020)', sym:'骰', clr:'#e06070'},
-  {id:'xl-mantou',  rarity:'common', name:'One Steamed Bun',       char:'谢怜',  sub:'A feast for a prince',         bg:'linear-gradient(150deg,#1c1008,#2e1c10)', sym:'食', clr:'#d4a050'},
-  {id:'hc-btfly',   rarity:'common', name:'Silver Butterfly',      char:'花城',  sub:'His eyes and hands',           bg:'linear-gradient(150deg,#160018,#280030)', sym:'蝶', clr:'#b870c8'},
-  {id:'ruoye',      rarity:'common', name:'Ruoye',                  char:'绕野',  sub:'Faithful as a prayer',         bg:'linear-gradient(150deg,#0a1624,#142038)', sym:'绕', clr:'#6890b8'},
-  {id:'xl-tired',   rarity:'common', name:'800 Years Tired',       char:'谢怜',  sub:'Still going',                  bg:'linear-gradient(150deg,#10102c,#182248)', sym:'困', clr:'#9888c8'},
-  {id:'hc-smile',   rarity:'common', name:'San Lang Smiles',       char:'花城',  sub:'Dangerous',                    bg:'linear-gradient(150deg,#1c0008,#300010)', sym:'笑', clr:'#d85070'},
-  {id:'xl-pray',    rarity:'common', name:'A Small Prayer',        char:'谢怜',  sub:'Even one believer',            bg:'linear-gradient(150deg,#181028,#261840)', sym:'祈', clr:'#b098d0'},
-  {id:'hc-eye',     rarity:'common', name:'Crimson Rain Eye',      char:'花城',  sub:'Always watching',              bg:'linear-gradient(150deg,#1c0008,#2c0014)', sym:'目', clr:'#c02838'},
-  {id:'ling-wen',   rarity:'common', name:'Ling Wen',               char:'灵文',  sub:'The overworked',               bg:'linear-gradient(150deg,#101420,#1c2030)', sym:'文', clr:'#8090a8'},
-  {id:'sqx',        rarity:'common', name:'Wind Master',            char:'师青玄',sub:'Free as the wind',             bg:'linear-gradient(150deg,#081820,#103030)', sym:'风', clr:'#50a8b8'},
-  {id:'lang-qq',    rarity:'common', name:'Lang Qianqiu',           char:'郎千秋',sub:'Loyal sword',                  bg:'linear-gradient(150deg,#0c1808,#162010)', sym:'剑', clr:'#60a860'},
-  /* ── RARE (8) ── */
-  {id:'xl-regalia', rarity:'rare', name:'Crown Prince Regalia',    char:'谢怜',  sub:'God of Xianle',                img:IMG.lanterns, imgPos:'50% 35%'},
-  {id:'hc-gk',      rarity:'rare', name:'Ghost King',              char:'花城',  sub:'Crimson Rain Sought Flower',   img:IMG.crimson,  imgPos:'50% 28%'},
-  {id:'xl-lantern', rarity:'rare', name:'Lantern Release',         char:'谢怜',  sub:'A light in the dark',          img:IMG.release,  imgPos:'50% 30%'},
-  {id:'hc-protect', rarity:'rare', name:'I Will Stand Here',       char:'花城',  sub:'Steadfast, always',            img:IMG.crimson,  imgPos:'50% 55%'},
-  {id:'xl-hc-walk', rarity:'rare', name:'Walking Together',        char:'谢怜·花城',sub:'The long road',             img:IMG.together, imgPos:'50% 78%'},
-  {id:'autumn',     rarity:'rare', name:'Maple Season',            char:'谢怜·花城',sub:'Crowned in blossom',        img:IMG.autumn,   imgPos:'50% 35%'},
-  {id:'hc-horse',   rarity:'rare', name:'Stepping Into Wind',      char:'花城',  sub:'Lord of Ghost City',           img:IMG.crimson,  imgPos:'50% 15%'},
-  {id:'xl-sorrow',  rarity:'rare', name:'Beautiful Sorrow',        char:'谢怜',  sub:'Even this, beautiful',         img:IMG.together, imgPos:'50% 40%'},
-  /* ── LEGENDARY (4) ── */
-  {id:'hualian',    rarity:'legendary', name:'Ten Thousand Lanterns',   char:'花城·谢怜',sub:'For you, every light',          img:IMG.lanterns, imgPos:'50% 42%'},
-  {id:'crown',      rarity:'legendary', name:'The Crown Returned',      char:'花城·谢怜',sub:'As it always should have been',  img:IMG.together, imgPos:'50% 30%'},
-  {id:'sovereign',  rarity:'legendary', name:'Crown Prince, Sovereign', char:'仙乐太子', sub:'The realm bows',                img:IMG.release,  imgPos:'50% 20%'},
-  {id:'san-gege',   rarity:'legendary', name:'San Lang & Gege',         char:'花城·谢怜',sub:'Eight hundred years',           img:IMG.autumn,   imgPos:'50% 25%'},
+  /* ── COMMON (37) ── */
+  {id:'xl-broom',      rarity:'common', name:'The Holy Broom',         char:'谢怜',    sub:'800 years of sweeping',               bg:'linear-gradient(150deg,#14102a,#1e1840)', sym:'帚', clr:'#c8a8d8'},
+  {id:'hc-dice',       rarity:'common', name:'The Silver Die',          char:'花城',    sub:'Let fate decide',                     bg:'linear-gradient(150deg,#1a0012,#300020)', sym:'骰', clr:'#e06070'},
+  {id:'xl-mantou',     rarity:'common', name:'One Steamed Bun',         char:'谢怜',    sub:'A feast for a prince',                bg:'linear-gradient(150deg,#1c1008,#2e1c10)', sym:'食', clr:'#d4a050'},
+  {id:'hc-btfly',      rarity:'common', name:'Silver Butterfly',        char:'花城',    sub:'His eyes and hands',                  bg:'linear-gradient(150deg,#160018,#280030)', sym:'蝶', clr:'#b870c8'},
+  {id:'ruoye',         rarity:'common', name:'Ruoye',                    char:'绕野',    sub:'Faithful as a prayer',                bg:'linear-gradient(150deg,#0a1624,#142038)', sym:'绕', clr:'#6890b8'},
+  {id:'xl-tired',      rarity:'common', name:'800 Years Tired',          char:'谢怜',    sub:'Still going',                         bg:'linear-gradient(150deg,#10102c,#182248)', sym:'困', clr:'#9888c8'},
+  {id:'hc-smile',      rarity:'common', name:'San Lang Smiles',          char:'花城',    sub:'Dangerous',                           img:"gacha/San Lang.jpg",                    imgPos:'50% 20%'},
+  {id:'xl-pray',       rarity:'common', name:'A Small Prayer',           char:'谢怜',    sub:'Even one believer',                   bg:'linear-gradient(150deg,#181028,#261840)', sym:'祈', clr:'#b098d0'},
+  {id:'hc-eye',        rarity:'common', name:'Crimson Rain Eye',         char:'花城',    sub:'Always watching',                     bg:'linear-gradient(150deg,#1c0008,#2c0014)', sym:'目', clr:'#c02838'},
+  {id:'ling-wen',      rarity:'common', name:'Ling Wen',                 char:'灵文',    sub:'The overworked',                      bg:'linear-gradient(150deg,#101420,#1c2030)', sym:'文', clr:'#8090a8'},
+  {id:'sqx',           rarity:'common', name:'Wind Master',              char:'师青玄',  sub:'Free as the wind',                    bg:'linear-gradient(150deg,#081820,#103030)', sym:'风', clr:'#50a8b8'},
+  {id:'lang-qq',       rarity:'common', name:'Lang Qianqiu',             char:'郎千秋',  sub:'Loyal sword',                         img:"gacha/First Meeting.jpg",               imgPos:'50% 20%'},
+  {id:'mu-qing',       rarity:'common', name:'Mu Qing',                  char:'慕情',    sub:'Complicated loyalty',                 img:"gacha/Mu Qing.jpeg",                    imgPos:'50% 20%'},
+  {id:'feng-xin',      rarity:'common', name:'Feng Xin',                 char:'风信',    sub:'Never misses',                        img:"gacha/Feng Xin.jpeg",                   imgPos:'50% 20%'},
+  {id:'he-xuan',       rarity:'common', name:'He Xuan',                  char:'贺玄',    sub:'The deep abyss',                      img:"gacha/He Xuan.jpg",                     imgPos:'50% 20%'},
+  {id:'qi-rong',       rarity:'common', name:'Qi Rong',                  char:'戚容',    sub:'Green-Lantern Ghost',                 img:"gacha/Qi Rong.jpg",                     imgPos:'50% 20%'},
+  {id:'pei-ming',      rarity:'common', name:'Pei Ming',                 char:'裴茗',    sub:'The general above',                   img:"gacha/Pei Ming.jpg",                    imgPos:'50% 20%'},
+  {id:'banyue',        rarity:'common', name:'Banyue',                   char:'半月',    sub:'Between two worlds',                  img:"gacha/Banyue.jpg",                      imgPos:'50% 20%'},
+  {id:'xuan-ji',       rarity:'common', name:'Xuan Ji',                  char:'玄机',    sub:'Obsession unending',                  img:"gacha/Xuan Ji.jpg",                     imgPos:'50% 20%'},
+  {id:'black-water',   rarity:'common', name:'Black Water',              char:'黑水',    sub:'The deep current',                    img:"gacha/Black Water.jpg",                 imgPos:'50% 30%'},
+  {id:'e-ming',        rarity:'common', name:"E'Ming",                   char:'厄命',    sub:'The scimitar speaks',                 img:"gacha/E'Ming.jpg",                      imgPos:'50% 30%'},
+  {id:'heavenly-seal', rarity:'common', name:'Heavenly Seal',            char:'天庭',    sub:'Power and burden',                    img:"gacha/Heavenly Seal.jpg",               imgPos:'50% 30%'},
+  {id:'fangxin',       rarity:'common', name:'Fangxin Butterfly',        char:'芳心',    sub:'A ghost butterfly',                   img:"gacha/Fangxin Butterfly.jpg",           imgPos:'50% 30%'},
+  {id:'spirit-array',  rarity:'common', name:'Spiritual Array',          char:'法阵',    sub:'Bound by heaven',                     img:"gacha/Spiritual Array.jpg",             imgPos:'50% 30%'},
+  {id:'paradise',      rarity:'common', name:'Paradise Manor',           char:'极乐坊',  sub:'Ghosts welcome',                      img:"gacha/Paradise Manor.jpg",              imgPos:'50% 30%'},
+  {id:'nan-feng',      rarity:'common', name:'Nan Feng',                 char:'南风',    sub:'Faithful attendant',                  img:"gacha/Nan Feng.jpg",                    imgPos:'50% 20%'},
+  {id:'fu-yao',        rarity:'common', name:'Fu Yao',                   char:'扶摇',    sub:'Light as the wind',                   img:"gacha/Fu Yao.jpg",                      imgPos:'50% 20%'},
+  {id:'sword-rain',    rarity:'common', name:'Rain of Swords',           char:'剑雨',    sub:'Ten thousand blades',                 bg:'linear-gradient(150deg,#141420,#1c1c2c)', sym:'雨', clr:'#a0a0d0'},
+  {id:'ghost-gate',    rarity:'common', name:'Ghost City Gate',          char:'鬼市',    sub:'All are welcome here',                img:"gacha/Ghost City Gate.jpg",             imgPos:'50% 30%'},
+  {id:'xianle-crown',  rarity:'common', name:'Crown of Xianle',          char:'仙乐',    sub:'A golden weight',                     img:"gacha/Crown of Xianle.jpg",             imgPos:'50% 30%'},
+  {id:'red-string',    rarity:'common', name:'Red String',               char:'红线',    sub:'Tied across lifetimes',               img:"gacha/Red String.jpg",                  imgPos:'50% 30%'},
+  {id:'incense',       rarity:'common', name:'One Stick of Incense',     char:'香',      sub:'A prayer answered',                   img:"gacha/One Stick of Incense tgcf.jpg",   imgPos:'50% 30%'},
+  {id:'bwx-mark',      rarity:'common', name:'White No-Face',            char:'白无相',  sub:'Smile and smile',                     img:"gacha/White No-Face.jpg",               imgPos:'50% 20%'},
+  {id:'cr-title',      rarity:'common', name:'Crimson Rain Title',       char:'血雨探花', sub:'Four words, one title',               bg:'linear-gradient(150deg,#1c0008,#2c0010)', sym:'花', clr:'#c82030'},
+  {id:'pei-xiu',       rarity:'common', name:'Pei Xiu',                  char:'裴宿',    sub:'Unseen until too late',               img:"gacha/Pei Xiu.jpg",                     imgPos:'50% 20%'},
+  {id:'heavenly-ct',   rarity:'common', name:'Heavenly Court',           char:'天庭',    sub:'High above the clouds',               img:"gacha/Heavenly Court.jpeg",             imgPos:'50% 30%'},
+  {id:'xl-shackles',   rarity:'common', name:"Xie Lian's Shackles",      char:'谢怜',    sub:'Worn with grace',                     img:"gacha/Xie Lian's Shackles.jpg",         imgPos:'50% 30%'},
+
+  /* ── RARE (25) ── */
+  {id:'xl-regalia',    rarity:'rare', name:'Crown Prince Regalia',       char:'谢怜',      sub:'God of Xianle',                      img:IMG.lanterns,                                  imgPos:'50% 35%'},
+  {id:'hc-gk',         rarity:'rare', name:'Ghost King',                 char:'花城',      sub:'Crimson Rain Sought Flower',         img:"gacha/Crimson Rain Sought Flower.jpg",         imgPos:'50% 28%'},
+  {id:'xl-lantern',    rarity:'rare', name:'Lantern Release',            char:'谢怜',      sub:'A light in the dark',                img:IMG.release,                                   imgPos:'50% 30%'},
+  {id:'hc-protect',    rarity:'rare', name:'I Will Stand Here',          char:'花城',      sub:'Steadfast, always',                  img:IMG.crimson,                                   imgPos:'50% 55%'},
+  {id:'xl-hc-walk',    rarity:'rare', name:'Walking Together',           char:'谢怜·花城', sub:'The long road',                      img:IMG.together,                                  imgPos:'50% 78%'},
+  {id:'autumn',        rarity:'rare', name:'Maple Season',               char:'谢怜·花城', sub:'Crowned in blossom',                 img:IMG.autumn,                                    imgPos:'50% 35%'},
+  {id:'hc-horse',      rarity:'rare', name:'Stepping Into Wind',         char:'花城',      sub:'Lord of Ghost City',                 img:IMG.crimson,                                   imgPos:'50% 15%'},
+  {id:'xl-sorrow',     rarity:'rare', name:'Beautiful Sorrow',           char:'谢怜',      sub:'Even this, beautiful',               img:"gacha/xie lian.jpg",                          imgPos:'50% 25%'},
+  {id:'hualian-cave',  rarity:'rare', name:'The Cave',                   char:'花城·谢怜', sub:'I have liked you for a long time',   img:"gacha/The Cave .jpg",                         imgPos:'50% 50%'},
+  {id:'mu-feng-r',     rarity:'rare', name:'Mu Qing & Feng Xin',        char:'慕情·风信', sub:'Brothers in arms',                   img:"gacha/Mu Qing & Feng Xin.jpg",                imgPos:'50% 30%'},
+  {id:'ghost-city-r',  rarity:'rare', name:'Lord of Ghost City',         char:'花城',      sub:'Welcome, welcome',                   img:"gacha/Lord of Ghost City.jpg",                imgPos:'50% 30%'},
+  {id:'bwx-r',         rarity:'rare', name:'White No-Face Rises',        char:'白无相',    sub:'Your highness, please smile',        img:"gacha/White No-Face Rises.jpg",               imgPos:'50% 25%'},
+  {id:'sword-rain-r',  rarity:'rare', name:'Three Hundred Swords',       char:'谢怜',      sub:'Still he did not fall',              img:"gacha/Three Hundred Swords.jpg",              imgPos:'50% 30%'},
+  {id:'hx-deep',       rarity:'rare', name:'Black Water Sinking',        char:'贺玄',      sub:'The bottom of the sea',              img:"gacha/Black Water Sinking.jpg",               imgPos:'50% 30%'},
+  {id:'first-lantern', rarity:'rare', name:'First Lantern Night',        char:'花城·谢怜', sub:'The beginning of everything',        img:"gacha/First Lantern Night.jpg",               imgPos:'50% 30%'},
+  {id:'qi-rong-r',     rarity:'rare', name:'Green Ghost Prince',         char:'戚容',      sub:'Your cousin is here',                img:"gacha/Green Ghost Prince.webp",               imgPos:'50% 25%'},
+  {id:'martial-god',   rarity:'rare', name:'God of Martial Arts',        char:'谢怜',      sub:'Three times ascended',               img:"gacha/God of Martial Arts.jpg",               imgPos:'50% 30%'},
+  {id:'banyue-pass',   rarity:'rare', name:'Banyue Pass',                char:'半月',      sub:'A kingdom lost',                     img:IMG.autumn,                                    imgPos:'50% 50%'},
+  {id:'gen-pei',       rarity:'rare', name:'General Pei',                char:'裴茗',      sub:'Above the northern heavens',         img:"gacha/General Pei.jpg",                       imgPos:'50% 30%'},
+  {id:'sqx-fan',       rarity:'rare', name:'Wind Master & Fan',          char:'师青玄',    sub:'The fan never lies',                 img:"gacha/Wind Master & Fan.jpg",                 imgPos:'50% 30%'},
+  {id:'hualian-dance', rarity:'rare', name:'The Dance',                  char:'花城·谢怜', sub:'Only for you',                       img:"gacha/The Dance.jpg",                         imgPos:'50% 30%'},
+  {id:'e-ming-r',      rarity:'rare', name:"E'Ming Awakens",             char:'厄命',      sub:'The scimitar wants blood',           img:"gacha/E'Ming Awakens.jpg",                    imgPos:'50% 30%'},
+  {id:'xl-mortal',     rarity:'rare', name:'Mortal Xie Lian',            char:'谢怜',      sub:'Just a man with a broom',            img:"gacha/Mortal Xie Lian.webp",                  imgPos:'50% 30%'},
+  {id:'lw-scrolls',    rarity:'rare', name:'Ling Wen Burning',           char:'灵文',      sub:'All the scrolls, all the time',      img:IMG.together,                                  imgPos:'50% 30%'},
+  {id:'hualian-vow',   rarity:'rare', name:'The Promise',                char:'花城·谢怜', sub:'I will always be here',              img:"gacha/Wedding Crimson Rain.jpeg",              imgPos:'50% 30%'},
+
+  /* ── LEGENDARY (12) ── */
+  {id:'hualian',       rarity:'legendary', name:'Ten Thousand Lanterns',    char:'花城·谢怜', sub:'For you, every light',                        img:IMG.lanterns,                             imgPos:'50% 42%'},
+  {id:'crown',         rarity:'legendary', name:'The Crown Returned',        char:'花城·谢怜', sub:'As it always should have been',               img:IMG.together,                             imgPos:'50% 30%'},
+  {id:'sovereign',     rarity:'legendary', name:'Crown Prince, Sovereign',   char:'仙乐太子',  sub:'The realm bows',                              img:IMG.release,                              imgPos:'50% 20%'},
+  {id:'san-gege',      rarity:'legendary', name:'San Lang & Gege',           char:'花城·谢怜', sub:'Eight hundred years',                         img:"gacha/other image.jpg",                  imgPos:'50% 30%'},
+  {id:'cr-ascend',     rarity:'legendary', name:'Crimson Rain Ascends',      char:'血雨探花',  sub:'The most notorious ghost in history',         img:IMG.crimson,                              imgPos:'50% 30%'},
+  {id:'xl-thrice',     rarity:'legendary', name:'Three Times Beloved',       char:'仙乐太子',  sub:'The only god with no worshippers',            img:"gacha/Three Times Beloved.jpg",          imgPos:'50% 30%'},
+  {id:'forever-800',   rarity:'legendary', name:'Forever and Eight Hundred', char:'花城·谢怜', sub:'Gege, I have liked you for a very long time', img:"gacha/more image.jpg",                   imgPos:'50% 40%'},
+  {id:'red-thread',    rarity:'legendary', name:'Fated Red Thread',          char:'花城·谢怜', sub:'Across every lifetime',                       img:"gacha/Fated Red Thread.jpg",             imgPos:'50% 30%'},
+  {id:'butterfly-pal', rarity:'legendary', name:'Palace of Silver Wings',    char:'花城',      sub:'Built every stone for you',                   img:"gacha/Palace of Silver Wings.jpg",       imgPos:'50% 30%'},
+  {id:'xl-calamity',   rarity:'legendary', name:'The Third Calamity',        char:'谢怜',      sub:'Even so, I do not regret',                    img:IMG.release,                              imgPos:'50% 38%'},
+  {id:'into-rain',     rarity:'legendary', name:'Into the Rain',             char:'花城·谢怜', sub:'I will shelter you from every storm',         img:"gacha/another image.jpg",                imgPos:'50% 40%'},
+  {id:'gods-ghosts',   rarity:'legendary', name:'God and Ghost King',        char:'花城·谢怜', sub:'Heaven and earth cannot keep us apart',       img:"gacha/extra image.jpg",                  imgPos:'50% 35%'},
 ];
 
 /* Each beat: speaker = "xie_lian" | "hua_cheng" | "narrator" */
@@ -1239,8 +1293,13 @@ function renderCollection(){
     const card=document.createElement('div');
     card.className='s-card '+st.rarity+(isOwned?'':' locked');
     let inner='';
-    if(st.img){inner+=`<div class="s-img" style="background-image:url('${st.img}');background-position:${st.imgPos||'center'}"></div>`;}
-    else{inner+=`<div class="s-grad" style="background:${st.bg}"></div><div class="s-sym" style="color:${st.clr||'#fff'}">${st.sym}</div>`;}
+    if(!isOwned){
+      inner+=`<div class="s-mystery"><span class="s-mystery-sym">蝶</span></div>`;
+    } else if(st.img){
+      inner+=`<div class="s-img" style="background-image:url('${st.img}');background-position:${st.imgPos||'center'}"></div>`;
+    } else {
+      inner+=`<div class="s-grad" style="background:${st.bg}"></div><div class="s-sym" style="color:${st.clr||'#fff'}">${st.sym}</div>`;
+    }
     const dots=st.rarity==='legendary'?3:st.rarity==='rare'?2:1;
     inner+=`<div class="s-foot"><span class="s-char">${isOwned?esc(st.char):'???'}</span><span class="s-name">${isOwned?esc(st.name):'Unknown'}</span><div class="s-dots">${'<span></span>'.repeat(dots)}</div></div>`;
     card.innerHTML=inner;
