@@ -367,6 +367,11 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 /* ── INFO TUTORIAL ── */
 #info-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.11);color:rgba(237,230,208,0.45);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.22s;font-family:'Noto Serif',serif;flex-shrink:0;margin-left:6px;}
 #info-btn:hover{border-color:rgba(245,192,64,0.42);color:var(--gold);background:rgba(245,192,64,0.08);box-shadow:0 0 14px rgba(245,192,64,0.14);}
+#music-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.11);color:rgba(237,230,208,0.45);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.22s;font-family:'Noto Serif SC',serif;flex-shrink:0;position:relative;}
+#music-btn:hover{border-color:rgba(245,192,64,0.42);color:var(--gold);background:rgba(245,192,64,0.08);box-shadow:0 0 14px rgba(245,192,64,0.14);}
+#music-btn.on{color:var(--gold);border-color:rgba(245,192,64,0.42);background:rgba(245,192,64,0.08);box-shadow:0 0 14px rgba(245,192,64,0.14);}
+#music-btn.off{opacity:0.5;}
+#music-btn.off::after{content:"";position:absolute;left:5px;right:5px;top:50%;height:1px;background:rgba(237,230,208,0.55);transform:rotate(-20deg);}
 #info-ov{position:fixed;inset:0;z-index:200;background:rgba(2,1,8,0.94);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:0 16px 80px;scrollbar-width:thin;scrollbar-color:rgba(232,144,26,0.18) transparent;}
 #info-ov.open{display:flex;animation:fadeIn 0.32s ease;}
 #info-ov::-webkit-scrollbar{width:4px;}
@@ -430,6 +435,8 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 </head>
 <body>
 
+<audio id="bgm" loop preload="auto" src="music/theme.mp3"></audio>
+
 <div id="xp-bar"></div>
 <div id="bgs-overview" class="bg-scene active"></div>
 <div id="bgs-tasks"    class="bg-scene"></div>
@@ -451,6 +458,7 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
     </div>
     <div id="sb-right">
       <div id="sb-bf"><span id="sb-bf-i">🦋</span><span id="sb-bf-n">0</span></div>
+      <button id="music-btn" onclick="toggleMusic()" title="Toggle music · 音">音</button>
       <button id="info-btn" onclick="toggleInfo()" title="How to use">?</button>
     </div>
   </div>
@@ -1476,6 +1484,40 @@ quoteIdx=Math.floor(Math.random()*QUOTES.length);
 document.getElementById('ov-quote').textContent=QUOTES[quoteIdx];
 setInterval(nextQuote,22000);
 switchBg('overview');
+
+/* ── BACKGROUND MUSIC ── */
+const MUSIC_KEY='musicOn';
+let musicOn=false;
+try{musicOn=localStorage.getItem(MUSIC_KEY)==='1';}catch(e){}
+function updateMusicBtn(){
+  const b=document.getElementById('music-btn');if(!b)return;
+  b.classList.toggle('on',musicOn);
+  b.classList.toggle('off',!musicOn);
+  b.setAttribute('title',musicOn?'Music on · tap to mute':'Music off · tap to play');
+}
+function playMusic(){
+  const a=document.getElementById('bgm');if(!a||!a.getAttribute('src'))return;
+  const p=a.play();
+  if(p&&p.catch)p.catch(()=>{});
+}
+function toggleMusic(){
+  musicOn=!musicOn;
+  try{localStorage.setItem(MUSIC_KEY,musicOn?'1':'0');}catch(e){}
+  const a=document.getElementById('bgm');
+  if(a){ if(musicOn)playMusic(); else a.pause(); }
+  updateMusicBtn();
+}
+/* Autoplay if previously on; if the browser blocks autoplay, start on first user interaction. */
+function armMusicAutoplay(){
+  if(!musicOn)return;
+  playMusic();
+  const a=document.getElementById('bgm');
+  const kick=()=>{ if(musicOn&&a&&a.paused)playMusic(); cleanup(); };
+  const cleanup=()=>{['pointerdown','keydown','touchstart'].forEach(e=>window.removeEventListener(e,kick));};
+  ['pointerdown','keydown','touchstart'].forEach(e=>window.addEventListener(e,kick,{once:false}));
+}
+updateMusicBtn();
+armMusicAutoplay();
 
 /* ── INFO TUTORIAL ── */
 function toggleInfo(){document.getElementById('info-ov').classList.toggle('open');cancelReset();}
