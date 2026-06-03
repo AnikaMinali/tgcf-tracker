@@ -634,14 +634,14 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
     <div class="info-hero">
       <span class="info-hero-glyph">仙</span>
       <div class="info-hero-title">Merit Ledger · 功德录</div>
-      <div class="info-hero-sub">A Heaven Official's Blessing–themed daily tracker built for your TikTok editing journey. Complete tasks and habits to earn Spiritual Power, rank up through the celestial court, and collect TGCF sticker cards as rewards.</div>
+      <div class="info-hero-sub">A Heaven Official's Blessing–themed daily tracker for whatever quest you're on. Complete tasks and habits to earn Spiritual Power, rank up through the celestial court, and collect TGCF sticker cards as rewards.</div>
     </div>
 
     <div class="info-section">
       <div class="info-sec-head"><span class="info-sec-glyph">今</span><span class="info-sec-title">Today — Your Daily Home</span></div>
       <div class="info-body">
         The <strong>Today tab</strong> is your home base. It shows your current rank, SP total, and progress toward the next rank — plus your <strong>daily habits</strong> with a tap-to-complete button.<br/><br/>
-        Your <strong>day streak</strong> counts how many days in a row you've done any task or habit. The <strong>Videos Done</strong> counter tracks all completed quests. Below your stats you'll see your last few completed actions and a rotating motivational quote.
+        Your <strong>day streak</strong> counts how many days in a row you've done any task or habit. Below your stats you'll see your last few completed actions and a rotating motivational quote.
       </div>
       <div class="info-tip">The speech bubble below the character cycles through chapter quotes — tap it to advance. The characters themselves react when you complete things.</div>
     </div>
@@ -651,11 +651,11 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
       <div class="info-body">
         <strong>Quests</strong> are one-off tasks. Each has a difficulty tier that determines how much SP you earn when you complete it — tap the circle on the left to check it off:
         <br/><br/>
-        <div class="info-row"><span class="itag blessing">Blessing</span> Quick or easy. Writing captions, planning a hook, importing clips.</div>
-        <div class="info-row"><span class="itag trial">Trial</span> Normal effort. Filming footage, cutting and sequencing an edit.</div>
-        <div class="info-row"><span class="itag calamity">Calamity</span> Hard or scary. Posting the video, tackling a big collab, a complex edit.</div>
+        <div class="info-row"><span class="itag blessing">Blessing</span> Quick or easy. A small errand, a short note, a five-minute tidy.</div>
+        <div class="info-row"><span class="itag trial">Trial</span> Normal effort. A focused work session, an errand that takes real time.</div>
+        <div class="info-row"><span class="itag calamity">Calamity</span> Hard or scary. The big project, the daunting conversation, the thing you keep putting off.</div>
         <br/>
-        <strong>Daily Habits</strong> live below the quest list. Add a recurring habit (like "Edit & post today's video") and track its streak separately. Each habit completion also earns you <strong>+1 🦋 butterfly</strong>.
+        <strong>Daily Habits</strong> live below the quest list. Add a recurring habit (like "Drink water" or "Practice for 20 minutes") and track its streak separately. Each habit completion also earns you <strong>+1 🦋 butterfly</strong>.
       </div>
       <div class="info-tip">Completing a Calamity triggers a crimson petal storm and an extra chibi reaction — reserve the tier for things that actually feel daunting.</div>
     </div>
@@ -705,7 +705,7 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
       <div class="info-body">
         <div class="info-row">— <span>Move your mouse for silver butterfly and parallax effects.</span></div>
         <div class="info-row">— <span>The SP value on each task is editable — set it higher for things that actually take effort.</span></div>
-        <div class="info-row">— <span><strong>Done &gt; perfect.</strong> A rough edit posted beats a perfect edit sitting in drafts.</span></div>
+        <div class="info-row">— <span><strong>Done &gt; perfect.</strong> A task finished beats a perfect plan that never starts.</span></div>
         <div class="info-row">— <span>Progress is saved automatically in your browser. Nothing is lost on refresh.</span></div>
         <div class="info-row">— <span>Press <strong>Escape</strong> or click outside to close any overlay.</span></div>
       </div>
@@ -858,7 +858,7 @@ function loop(){ctx.clearRect(0,0,W,H);tickStars();drawStars();tickButterflies()
 /* ════════════════════════════════════
    DATA
    ════════════════════════════════════ */
-const QUOTES=["No matter what, just keep posting.","Even 800 years of bad luck couldn't stop me. One imperfect video is still a video posted.","One edit, one upload, one day at a time. The algorithm remembers the consistent.","San Lang always says gege works too hard. But the work continues, beautifully.","The heavens favor the patient, but the For You Page favors the persistent.","I once swept a temple for 200 years. Your editing queue is, comparatively, a kindness.","Ruoye binds what it must. So do you, when you press record.","The Three Calamities did not break me. A tough edit shall not break you.","Even a god must start somewhere. Post it. Fix it tomorrow.","Hua Cheng built Ghost City from nothing. You're building an audience, one video at a time.","Done is better than perfect. The heavens don't grade on aesthetics.","Gege, you posted again — the realm has taken note."];
+const QUOTES=["No matter what, just keep going.","Xie Lian survived 800 years of bad luck. You can survive this inbox.","One email, one errand, one form. The heavens remember the consistent.","San Lang always says gege works too hard. But the laundry won't fold itself — so let's fold it, beautifully.","A deadline is just a calamity with a calendar. You've faced worse.","I once swept a temple for 200 years. Your to-do list is, comparatively, a kindness.","Ruoye binds what it must. So do you, when you finally open that tab you've been avoiding.","The Three Calamities did not break me. Neither will Monday.","Even a god must start somewhere. Open the document. The first sentence is the hardest.","Hua Cheng built Ghost City from nothing. You're building your week, one task at a time.","Done is better than perfect. The heavens don't grade on flawlessness — they grade on showing up.","Adulting is just cultivation with more paperwork. Breathe, and continue.","Reply to one message. Then one more. This is how empires — and inboxes — are cleared.","The dishes are not a calamity. The dishes only think they are.","Study one page. The heavens favor the patient, and so do exams.","Gege, you finished another — the realm has taken note."];
 
 const IMG={
   lanterns:"tgcf/WhatsApp Image 2026-05-26 at 20.38.59.jpeg",
@@ -1239,7 +1239,7 @@ function render(){
   // Habits on home tab
   const hh=document.getElementById('ov-habits-home');if(hh){hh.innerHTML='';
   if(state.habits.length){hh.innerHTML=`<div class="ov-section-lbl">daily · 今日修行</div>`;state.habits.forEach(h=>{const pill=document.createElement('div');pill.className='habit-pill';const doneToday=h.lastDone===todayKey();const stage=HABIT_STAGES.find(s=>h.streak>=s.min&&h.streak<=s.max)||HABIT_STAGES[0];pill.innerHTML=`<div><div class="habit-pill-name">${esc(h.title)}</div><div style="font-size:9px;color:var(--lbl);margin-top:2px;letter-spacing:0.12em;text-transform:uppercase;">${stage.name} · +${h.sp} SP</div></div><div style="text-align:center"><div class="habit-pill-streak">${h.streak}</div><div class="habit-pill-slbl">day${h.streak!==1?'s':''}</div></div><button class="btn-cult-pill ${doneToday?'done':''}" ${doneToday?'disabled':''}>${doneToday?'✓ Done':'Do it'}</button>`;if(!doneToday)pill.querySelector('.btn-cult-pill').onclick=e=>cultivateHabit(h.id,e);hh.appendChild(pill);});}
-  else{hh.innerHTML=`<div class="ov-section-lbl">daily · 今日修行</div><div class="habit-pill-empty">No habits yet — add one in Quests to track your daily edit streak.</div>`;}}
+  else{hh.innerHTML=`<div class="ov-section-lbl">daily · 今日修行</div><div class="habit-pill-empty">No habits yet — add one in Quests to track your daily streak.</div>`;}}
   // Habits on habits tab (if it exists)
   const hl=document.getElementById('habitList');if(hl){hl.innerHTML='';
   if(!state.habits.length){hl.innerHTML=`<div class="empty"><span class="empty-glyph">禅</span>No habits yet.</div>`;}
@@ -1282,14 +1282,14 @@ function addTask(){const te=document.getElementById('newTaskTitle'),tr=document.
 function toggleTask(id,evt){
   const t=state.tasks.find(x=>x.id===id);if(!t)return;
   if(t.done){t.done=false;state.sp=Math.max(0,state.sp-t.sp);for(let i=state.journal.length-1;i>=0;i--){if(state.journal[i].taskId===id){state.journal.splice(i,1);break;}}}
-  else{t.done=true;state.sp+=t.sp;state.butterflies=(state.butterflies||0)+1;state.journal.push({t:now(),text:'Cleared: '+t.title+' ('+tierLbl(t.tier)+')',sp:t.sp,taskId:id});bumpStreak();burst(evt,t.tier==='calamity');triggerPetals(t.tier==='calamity');toast('+'+t.sp+' SP  ·  🦋 ×1',pickMsg(t.tier));checkRankUp();cycleDialogue();
+  else{t.done=true;state.sp+=t.sp;state.butterflies=(state.butterflies||0)+1;state.journal.push({t:now(),text:'Cleared: '+t.title+' ('+tierLbl(t.tier)+')',sp:t.sp,taskId:id});bumpStreak();burst(evt,t.tier==='calamity');triggerPetals(t.tier==='calamity');toast('+'+t.sp+' SP  ·  🦋 ×1',pickMsg(t));checkRankUp();cycleDialogue();
     if(t.tier==='calamity'){chibReact('xl','happy','happy',3000);chibReact('hc','watch','bounce',3000);}
     else if(t.tier==='trial'){chibReact('xl','happy','bounce',2600);chibReact('hc','hi','nod',2600);}
     else{chibReact('xl','happy','nod',2200);}
   }
   saveState();render();
 }
-function pickMsg(tier){const m={calamity:["You cleared a Calamity. Hua Cheng would approve.","Three Calamities once nearly broke a Crown Prince. You just bested one of yours.","Even the Ghost King pauses to admire that."],trial:["A trial endured is a step toward ascension.","Even San Lang would smile at this progress.","The shrine grows stronger by your hand."],blessing:["A small blessing — but the gods favor consistency.","Even sweeping the floor is a holy act, gege.","One brick added. The shrine stands taller."]};const a=m[tier]||m.blessing;return a[Math.floor(Math.random()*a.length)];}
+function pickMsg(task){const tier=(task&&task.tier)||(typeof task==='string'?task:'blessing');const name=(task&&task.title)?('「 '+task.title+' 」'):'that';const m={calamity:["You cleared a Calamity: "+name+". Hua Cheng would approve.","Three Calamities once nearly broke a Crown Prince. You just bested "+name+" before lunch.","Even the Ghost King pauses to admire "+name+" being done.","You faced "+name+" — the thing you'd been dreading all week — and it lost. The heavenly realm takes note.","Xie Lian survived 800 years of bad luck. You survived "+name+". You two should talk.","A god ascends three times. You just ascended past "+name+". Same energy."],trial:[name+" — a trial endured is a step toward ascension.","Even San Lang would smile at "+name+" being seen through.",name+" done. Adulting is just cultivation, and you cultivated well today.","You sat down, you focused, you finished "+name+". The heavenly officials, for once, have no complaints.",""+name+" handled. Not glamorous, but neither was sweeping temples for 200 years. It still counted.","One less thing on the list: "+name+". The week grows lighter by your hand."],blessing:[name+" — a small blessing, but the gods favor consistency.","Even small acts are holy ones, gege. "+name+" is finished.","One more brick laid: "+name+". The life you're building stands taller.","Hua Cheng built Ghost City for one person. You just finished "+name+". He'd respect the dedication.","You did "+name+". Tiny? Maybe. But the heavens are kept running by exactly such tiny things.","Ruoye reached out and "+name+" was done. Quietly, completely. Well done."]};const a=m[tier]||m.blessing;return a[Math.floor(Math.random()*a.length)];}
 function deleteTask(id){const t=state.tasks.find(x=>x.id===id);if(!t)return;if(!confirm("Banish task '"+t.title+"'?"))return;state.tasks=state.tasks.filter(x=>x.id!==id);saveState();render();}
 function addShrine(){const el=document.getElementById('newShrine');const name=el.value.trim();if(!name)return;const id='shrine-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-'+Math.random().toString(36).slice(2,6);state.shrines.push({id,name});state.activeShrine=id;el.value='';saveState();render();toast('Shrine erected.','「 '+name+' 」 now stands among the others.');}
 function removeShrine(id){if(state.shrines.length<=1){toast('Cannot banish.','At least one shrine must remain standing.');return;}const s=state.shrines.find(x=>x.id===id);if(!s)return;const tc=state.tasks.filter(t=>t.shrine===id).length;if(!confirm("Banish shrine '"+s.name+"'?"+(tc?' '+tc+' task(s) will be removed.':'')))return;state.shrines=state.shrines.filter(x=>x.id!==id);state.tasks=state.tasks.filter(t=>t.shrine!==id);if(state.activeShrine===id)state.activeShrine=state.shrines[0].id;saveState();render();}
@@ -1512,8 +1512,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){const io=document.g
 /* ── IDLE FIDGET ── */
 let _lastActivity=Date.now(),_idleFired=false;
 ['mousemove','keydown','click','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{_lastActivity=Date.now();_idleFired=false;},{passive:true}));
-const _IDLE_XL=[['eat',"Mn... rice."],['laying',"Just five more minutes..."],['worried',"That stack of tasks isn't getting smaller."],['eat',"Food first, tasks second."]];
-const _IDLE_HC=[['yawn',"*yawns elegantly*"],['watch',"I'm watching you. Work harder."],['sleep',"...zz"],['eat',"Gege, you haven't eaten."]];
+const _IDLE_XL=[['eat',"Mn... rice."],['laying',"Just five more minutes... then we tackle the inbox."],['worried',"That to-do list isn't getting shorter on its own."],['eat',"Food first, errands second. But errands still second."],['worried',"One small task. Just one, to start the momentum."],['laying',"Rest is allowed. Then we keep going."]];
+const _IDLE_HC=[['yawn',"*yawns elegantly*"],['watch',"I'm watching you. That deadline isn't going to wait."],['sleep',"...zz"],['eat',"Gege, you haven't eaten. The tasks can wait ten minutes."],['watch',"Pick the scariest thing on the list. Do it first. I'll be right here."],['watch',"You've done harder things than this. I've seen them."]];
 setInterval(()=>{
   if(Date.now()-_lastActivity<30000||_idleFired)return;
   _idleFired=true;
