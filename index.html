@@ -83,16 +83,15 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
   .sc-body{padding:16px 14px 100px;}
   #sc-overview .sc-body{padding:8px 14px 100px;}
 
-  /* Overview — compact chibi so quests show above fold */
-  .ov-layout{gap:16px;padding-top:8px;}
-  .char-frame{width:160px;height:224px;}
-  .char-bubble{max-width:160px;}
-  .chibi-stage{width:100%;height:200px;}
+  /* Overview — sticky chibi strip, stats scroll beneath */
+  .ov-layout{gap:0;padding-top:0;}
+  .chibi-stage{position:sticky;top:50px;z-index:3;width:100%;height:190px;background:rgba(1,0,6,0.88);backdrop-filter:blur(8px);}
   .chibi{height:110px;width:90px;object-fit:contain;}
-  .c-hc{left:20%;}
-  .c-xl{right:20%;}
+  .c-hc{left:2px;}
+  .c-xl{right:2px;}
   .chibi-ground{bottom:52px;}
   .chibi-wrap{bottom:54px;}
+  .ov-right{padding-top:16px;}
   .ov-sp-num{font-size:44px;}
   .ov-rank{font-size:24px;}
   .ov-prog{max-width:100%;}
@@ -424,7 +423,7 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 #dc-cap{position:absolute;left:0;right:0;bottom:0;padding:0 20px 22px;text-align:center;transform:translateZ(40px);transition:opacity 0.4s ease;}
 #dc-tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,1,8,0.10) 0%,transparent 30%,rgba(2,1,8,0.30) 62%,rgba(2,1,8,0.92) 100%);transition:opacity 0.4s ease;}
 #detail-ov.cinematic #dc-cap{opacity:0;pointer-events:none;}
-#detail-ov.cinematic #dc-tint{opacity:0;}
+#detail-ov.cinematic #dc-tint{opacity:0.25;}
 #detail-ov.open.cinematic #dc-meta{opacity:0;pointer-events:none;transition:opacity 0.4s ease;}
 #dc-rarity{font-family:'Noto Serif SC',serif;font-size:9px;letter-spacing:0.5em;text-transform:uppercase;margin-bottom:8px;}
 #dc-rarity .gem{display:inline-block;width:5px;height:5px;border-radius:50%;margin:0 2px;vertical-align:middle;background:currentColor;box-shadow:0 0 6px currentColor;}
@@ -1180,7 +1179,7 @@ function goScene(id){
   const prev=document.getElementById('sc-'+currentScene),next=document.getElementById('sc-'+id);
   if(!next)return;
   prev.classList.add('exit');switchBg(id);
-  setTimeout(()=>{prev.classList.remove('active','exit');next.classList.add('active');currentScene=id;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.sc===id));
+  setTimeout(()=>{prev.classList.remove('active','exit');next.classList.add('active');next.scrollTop=0;currentScene=id;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.sc===id));
     // Scene-contextual chibi poses
     if(id==='journal'){chibSet('hc','write');}
     else if(id==='collection'){chibSet('xl','happy',3500);chibSet('hc','flower',3500);}
