@@ -16,6 +16,7 @@
   --mist:rgba(237,230,208,0.35);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+button,input,select{touch-action:manipulation;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);}
 body{font-family:'Noto Serif',serif;color:var(--ivory);}
 
@@ -65,6 +66,74 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 /* ── OVERVIEW ── */
 .ov-layout{display:grid;grid-template-columns:260px 1fr;gap:48px;align-items:start;padding-top:32px;min-height:calc(100vh - 136px);}
 @media(max-width:780px){.ov-layout{grid-template-columns:1fr;gap:28px;min-height:auto;}}
+
+/* ── MOBILE ── */
+@media(max-width:600px){
+  /* iPhone home bar safe area */
+  #bottom-nav{height:auto;padding:6px 0 max(14px,env(safe-area-inset-bottom));gap:0;justify-content:space-around;}
+  .nav-btn{flex:1;padding:10px 8px;gap:5px;}
+  .nav-glyph{font-size:24px;}
+  .nav-lbl{font-size:9px;letter-spacing:0.22em;}
+
+  /* Status bar */
+  #status-bar{padding:0 14px;height:50px;}
+  .shrine-pill{padding:4px 9px;font-size:10px;}
+
+  /* Scene body — extra bottom so content clears nav */
+  .sc-body{padding:16px 14px 100px;}
+  #sc-overview .sc-body{padding:8px 14px 100px;}
+
+  /* Overview — compact chibi so quests show above fold */
+  .ov-layout{gap:16px;padding-top:8px;}
+  .char-frame{width:160px;height:224px;}
+  .char-bubble{max-width:160px;}
+  .chibi-stage{width:100%;height:200px;}
+  .chibi{height:110px;width:90px;object-fit:contain;}
+  .c-hc{left:20%;}
+  .c-xl{right:20%;}
+  .chibi-ground{bottom:52px;}
+  .chibi-wrap{bottom:54px;}
+  .ov-sp-num{font-size:44px;}
+  .ov-rank{font-size:24px;}
+  .ov-prog{max-width:100%;}
+  .ov-stats{max-width:100%;}
+  .ov-quote{max-width:100%;}
+
+  /* Task row — bigger touch targets, tighter gap */
+  .task{grid-template-columns:38px 1fr auto auto auto;gap:8px;padding:14px 10px;}
+  .check{width:32px;height:32px;}
+  .task-name{font-size:15px;}
+  .tier-tag{font-size:8px;padding:3px 6px;}
+  .del-btn{width:36px;height:36px;font-size:20px;}
+
+  /* Add form — 16px inputs prevent iOS zoom on focus */
+  .add-form input[type="text"]{font-size:16px;}
+  .add-form select{font-size:16px;}
+  .add-form input[type="number"]{font-size:16px;}
+  .add-form-row{flex-wrap:wrap;gap:10px;}
+  .btn-add{padding:12px 20px;width:100%;text-align:center;margin-top:4px;}
+
+  /* Habit pill */
+  .habit-pill{padding:14px;}
+  .btn-cult-pill{padding:10px 16px;font-size:11px;min-height:40px;}
+
+  /* Gacha — 2 columns for better art visibility */
+  .coll-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .gacha-banner{padding:14px 16px;flex-wrap:wrap;gap:12px;}
+  .gacha-bf-n{font-size:36px;}
+  .btn-gacha{width:100%;text-align:center;}
+
+  /* Detail card */
+  #detail-card{width:88vw;}
+  #detail-aura,#detail-ring{width:120vw;height:120vw;}
+  #dc-name{font-size:20px;}
+
+  /* Pull overlay */
+  #pull-wrap{width:200px;height:267px;}
+
+  /* Remove desktop-only cursor glow */
+  #cursor-glow{display:none;}
+}
 .char-card{display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none;}
 .char-frame{position:relative;width:220px;height:310px;border-radius:10px;overflow:hidden;border:1px solid rgba(245,192,64,0.20);box-shadow:0 0 50px rgba(232,144,26,0.10),0 0 120px rgba(232,144,26,0.04);transition:box-shadow 0.45s,transform 0.45s;}
 .char-card:hover .char-frame{box-shadow:0 0 65px rgba(245,192,64,0.22),0 0 160px rgba(232,144,26,0.09);transform:translateY(-5px) scale(1.012);}
@@ -120,10 +189,11 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 .c-glow-xl{width:170px;height:140px;background:rgba(245,192,64,0.13);bottom:46px;right:-8px;}
 .chibi-ground{position:absolute;bottom:70px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(245,192,64,0.14),transparent);}
 .chibi-wrap{position:absolute;bottom:72px;z-index:2;transition:opacity 0.7s ease;}
-.c-hc{left:4px;animation:chibFL 4.6s ease-in-out infinite;}
-.c-xl{right:4px;animation:chibFR 4.1s ease-in-out infinite 0.9s;}
+.c-hc{left:2px;animation:chibFL 4.6s ease-in-out infinite;}
+.c-xl{right:2px;animation:chibFR 4.1s ease-in-out infinite 0.9s;}
 .chibi-wrap.c-hidden{opacity:0;pointer-events:none;}
 .chibi{height:158px;width:auto;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.68));transition:filter 0.35s;}
+#chibi-xl{height:175px;}
 @keyframes chibFL{0%,100%{transform:translateY(0) rotate(-0.6deg);}50%{transform:translateY(-11px) rotate(0.6deg);}}
 @keyframes chibFR{0%,100%{transform:translateY(0) rotate(0.6deg);}50%{transform:translateY(-9px) rotate(-0.5deg);}}
 /* Reactions — !important overrides idle float */
@@ -339,7 +409,6 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 #detail-card.legendary{box-shadow:0 28px 92px rgba(0,0,0,0.72),0 0 0 2px rgba(245,192,64,0.72),0 0 86px rgba(245,192,64,0.42);}
 #dc-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(0.92) saturate(1.18);transform:translateZ(0);}
 #dc-sym{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);font-family:'Noto Serif SC',serif;font-size:150px;line-height:1;opacity:0.6;display:none;}
-#dc-tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,1,8,0.10) 0%,transparent 30%,rgba(2,1,8,0.30) 62%,rgba(2,1,8,0.92) 100%);}
 /* inner glow frame */
 #dc-frame{position:absolute;inset:0;border-radius:20px;box-shadow:0 0 0 1px rgba(255,255,255,0.08) inset,0 0 40px rgba(0,0,0,0.5) inset;pointer-events:none;}
 /* shimmer sweep across the art */
@@ -352,7 +421,11 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
 .dc-glint{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 8px 2px rgba(245,225,150,0.9);opacity:0;animation:glintTwinkle 2.2s ease-in-out infinite;}
 @keyframes glintTwinkle{0%,100%{opacity:0;transform:scale(0.4);}50%{opacity:1;transform:scale(1.15);}}
 /* caption block under the card */
-#dc-cap{position:absolute;left:0;right:0;bottom:0;padding:0 20px 22px;text-align:center;transform:translateZ(40px);}
+#dc-cap{position:absolute;left:0;right:0;bottom:0;padding:0 20px 22px;text-align:center;transform:translateZ(40px);transition:opacity 0.4s ease;}
+#dc-tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,1,8,0.10) 0%,transparent 30%,rgba(2,1,8,0.30) 62%,rgba(2,1,8,0.92) 100%);transition:opacity 0.4s ease;}
+#detail-ov.cinematic #dc-cap{opacity:0;pointer-events:none;}
+#detail-ov.cinematic #dc-tint{opacity:0;}
+#detail-ov.open.cinematic #dc-meta{opacity:0;pointer-events:none;transition:opacity 0.4s ease;}
 #dc-rarity{font-family:'Noto Serif SC',serif;font-size:9px;letter-spacing:0.5em;text-transform:uppercase;margin-bottom:8px;}
 #dc-rarity .gem{display:inline-block;width:5px;height:5px;border-radius:50%;margin:0 2px;vertical-align:middle;background:currentColor;box-shadow:0 0 6px currentColor;}
 #dc-char{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--gold);letter-spacing:0.16em;opacity:0.92;margin-bottom:3px;text-shadow:0 0 16px rgba(245,192,64,0.4);}
@@ -629,7 +702,7 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
     </div>
     <div id="dc-meta">
       <div id="dc-meta-line"></div>
-      <div id="dc-tap">tap anywhere to return</div>
+      <div id="dc-tap">tap card to admire · tap outside to return</div>
     </div>
   </div>
 </div>
@@ -879,43 +952,35 @@ const IMG={
 /* ── STICKER COLLECTION ── */
 const STICKERS=[
   /* ── COMMON (37) ── */
-  {id:'xl-broom',      rarity:'common', name:'The Holy Broom',         char:'谢怜',    sub:'800 years of sweeping',               bg:'linear-gradient(150deg,#14102a,#1e1840)', sym:'帚', clr:'#c8a8d8'},
-  {id:'hc-dice',       rarity:'common', name:'The Silver Die',          char:'花城',    sub:'Let fate decide',                     bg:'linear-gradient(150deg,#1a0012,#300020)', sym:'骰', clr:'#e06070'},
-  {id:'xl-mantou',     rarity:'common', name:'One Steamed Bun',         char:'谢怜',    sub:'A feast for a prince',                bg:'linear-gradient(150deg,#1c1008,#2e1c10)', sym:'食', clr:'#d4a050'},
-  {id:'hc-btfly',      rarity:'common', name:'Silver Butterfly',        char:'花城',    sub:'His eyes and hands',                  bg:'linear-gradient(150deg,#160018,#280030)', sym:'蝶', clr:'#b870c8'},
-  {id:'ruoye',         rarity:'common', name:'Ruoye',                    char:'绕野',    sub:'Faithful as a prayer',                bg:'linear-gradient(150deg,#0a1624,#142038)', sym:'绕', clr:'#6890b8'},
-  {id:'xl-tired',      rarity:'common', name:'800 Years Tired',          char:'谢怜',    sub:'Still going',                         bg:'linear-gradient(150deg,#10102c,#182248)', sym:'困', clr:'#9888c8'},
+  {id:'xl-broom',      rarity:'common', name:'Gege!',                  char:'花城·谢怜', sub:'Every. Single. Time.',               img:"gacha/funny.jpg",                       imgPos:'50% 50%'},
+  {id:'xl-mantou',     rarity:'common', name:'One Steamed Bun',         char:'谢怜',    sub:'A feast for a prince',                img:"gacha/one steamed bun.jpg",             imgPos:'50% 50%'},
+  {id:'hc-btfly',      rarity:'common', name:'Silver Butterfly',        char:'花城',    sub:'His eyes and hands',                  img:"gacha/silver butterfly.jpg",            imgPos:'50% 50%'},
+  {id:'ruoye',         rarity:'common', name:'Ruoye',                    char:'绕野',    sub:'Faithful as a prayer',                img:"gacha/rouye.jpg",                       imgPos:'50% 40%'},
+  {id:'xl-tired',      rarity:'common', name:'800 Years Tired',          char:'花城·谢怜', sub:'Still going',                        img:"gacha/800 year tired.jpg",              imgPos:'50% 50%'},
   {id:'hc-smile',      rarity:'common', name:'San Lang Smiles',          char:'花城',    sub:'Dangerous',                           img:"gacha/San Lang.jpg",                    imgPos:'50% 20%'},
-  {id:'xl-pray',       rarity:'common', name:'A Small Prayer',           char:'谢怜',    sub:'Even one believer',                   bg:'linear-gradient(150deg,#181028,#261840)', sym:'祈', clr:'#b098d0'},
-  {id:'hc-eye',        rarity:'common', name:'Crimson Rain Eye',         char:'花城',    sub:'Always watching',                     bg:'linear-gradient(150deg,#1c0008,#2c0014)', sym:'目', clr:'#c02838'},
-  {id:'ling-wen',      rarity:'common', name:'Ling Wen',                 char:'灵文',    sub:'The overworked',                      bg:'linear-gradient(150deg,#101420,#1c2030)', sym:'文', clr:'#8090a8'},
-  {id:'sqx',           rarity:'common', name:'Wind Master',              char:'师青玄',  sub:'Free as the wind',                    bg:'linear-gradient(150deg,#081820,#103030)', sym:'风', clr:'#50a8b8'},
+  {id:'ling-wen',      rarity:'common', name:'Ling Wen',                 char:'灵文',    sub:'The overworked',                      img:"gacha/Ling Wen.jpg",                    imgPos:'50% 20%'},
   {id:'lang-qq',       rarity:'common', name:'Lang Qianqiu',             char:'郎千秋',  sub:'Loyal sword',                         img:"gacha/First Meeting.jpg",               imgPos:'50% 20%'},
-  {id:'mu-qing',       rarity:'common', name:'Mu Qing',                  char:'慕情',    sub:'Complicated loyalty',                 img:"gacha/Mu Qing.jpeg",                    imgPos:'50% 20%'},
-  {id:'feng-xin',      rarity:'common', name:'Feng Xin',                 char:'风信',    sub:'Never misses',                        img:"gacha/Feng Xin.jpeg",                   imgPos:'50% 20%'},
+  {id:'mu-qing',       rarity:'common', name:'Mu Qing',                  char:'慕情',    sub:'Complicated loyalty',                 img:"gacha/Mu Qing.jpg",                    imgPos:'50% 20%'},
+  {id:'feng-xin',      rarity:'common', name:'Feng Xin',                 char:'风信',    sub:'Never misses',                        img:"gacha/Feng Xin.jpg",                   imgPos:'50% 20%'},
+  {id:'let-them-fight',rarity:'common', name:'Let Them Fight',           char:'谢怜·慕情·风信', sub:'He has paperwork to do.',        img:"gacha/let them fight.jpg",              imgPos:'50% 40%'},
   {id:'he-xuan',       rarity:'common', name:'He Xuan',                  char:'贺玄',    sub:'The deep abyss',                      img:"gacha/He Xuan.jpg",                     imgPos:'50% 20%'},
-  {id:'qi-rong',       rarity:'common', name:'Qi Rong',                  char:'戚容',    sub:'Green-Lantern Ghost',                 img:"gacha/Qi Rong.jpg",                     imgPos:'50% 20%'},
+  {id:'qi-rong',       rarity:'common', name:'Qi Rong',                  char:'戚容',    sub:'The Green Ghost',                     img:"gacha/Qi Rong.jpg",                     imgPos:'50% 20%'},
   {id:'pei-ming',      rarity:'common', name:'Pei Ming',                 char:'裴茗',    sub:'The general above',                   img:"gacha/Pei Ming.jpg",                    imgPos:'50% 20%'},
   {id:'banyue',        rarity:'common', name:'Banyue',                   char:'半月',    sub:'Between two worlds',                  img:"gacha/Banyue.jpg",                      imgPos:'50% 20%'},
   {id:'xuan-ji',       rarity:'common', name:'Xuan Ji',                  char:'玄机',    sub:'Obsession unending',                  img:"gacha/Xuan Ji.jpg",                     imgPos:'50% 20%'},
   {id:'black-water',   rarity:'common', name:'Black Water',              char:'黑水',    sub:'The deep current',                    img:"gacha/Black Water.jpg",                 imgPos:'50% 30%'},
-  {id:'e-ming',        rarity:'common', name:"E'Ming",                   char:'厄命',    sub:'The scimitar speaks',                 img:"gacha/E'Ming.jpg",                      imgPos:'50% 30%'},
   {id:'heavenly-seal', rarity:'common', name:'Heavenly Seal',            char:'天庭',    sub:'Power and burden',                    img:"gacha/Heavenly Seal.jpg",               imgPos:'50% 30%'},
-  {id:'fangxin',       rarity:'common', name:'Fangxin Butterfly',        char:'芳心',    sub:'A ghost butterfly',                   img:"gacha/Fangxin Butterfly.jpg",           imgPos:'50% 30%'},
+  {id:'fangxin',       rarity:'common', name:'Always Watching Over',      char:'花城',    sub:'Every wing his will',                 img:"gacha/Fangxin Butterfly.jpg",           imgPos:'50% 30%'},
   {id:'spirit-array',  rarity:'common', name:'Spiritual Array',          char:'法阵',    sub:'Bound by heaven',                     img:"gacha/Spiritual Array.jpg",             imgPos:'50% 30%'},
   {id:'paradise',      rarity:'common', name:'Paradise Manor',           char:'极乐坊',  sub:'Ghosts welcome',                      img:"gacha/Paradise Manor.jpg",              imgPos:'50% 30%'},
-  {id:'nan-feng',      rarity:'common', name:'Nan Feng',                 char:'南风',    sub:'Faithful attendant',                  img:"gacha/Nan Feng.jpg",                    imgPos:'50% 20%'},
-  {id:'fu-yao',        rarity:'common', name:'Fu Yao',                   char:'扶摇',    sub:'Light as the wind',                   img:"gacha/Fu Yao.jpg",                      imgPos:'50% 20%'},
-  {id:'sword-rain',    rarity:'common', name:'Rain of Swords',           char:'剑雨',    sub:'Ten thousand blades',                 bg:'linear-gradient(150deg,#141420,#1c1c2c)', sym:'雨', clr:'#a0a0d0'},
+  {id:'nan-feng',      rarity:'common', name:'Nan Feng',                 char:'风信',    sub:'Feng Xin, in disguise',               img:"gacha/Nan Feng.jpg",                    imgPos:'50% 20%'},
+  {id:'fu-yao',        rarity:'common', name:'Fu Yao',                   char:'慕情',    sub:'Mu Qing, in disguise',                img:"gacha/Fu Yao.jpg",                      imgPos:'50% 20%'},
   {id:'ghost-gate',    rarity:'common', name:'Ghost City Gate',          char:'鬼市',    sub:'All are welcome here',                img:"gacha/Ghost City Gate.jpg",             imgPos:'50% 30%'},
   {id:'xianle-crown',  rarity:'common', name:'Crown of Xianle',          char:'仙乐',    sub:'A golden weight',                     img:"gacha/Crown of Xianle.jpg",             imgPos:'50% 30%'},
   {id:'red-string',    rarity:'common', name:'Red String',               char:'红线',    sub:'Tied across lifetimes',               img:"gacha/Red String.jpg",                  imgPos:'50% 30%'},
-  {id:'incense',       rarity:'common', name:'One Stick of Incense',     char:'香',      sub:'A prayer answered',                   img:"gacha/One Stick of Incense tgcf.jpg",   imgPos:'50% 30%'},
   {id:'bwx-mark',      rarity:'common', name:'White No-Face',            char:'白无相',  sub:'Smile and smile',                     img:"gacha/White No-Face.jpg",               imgPos:'50% 20%'},
-  {id:'cr-title',      rarity:'common', name:'Crimson Rain Title',       char:'血雨探花', sub:'Four words, one title',               bg:'linear-gradient(150deg,#1c0008,#2c0010)', sym:'花', clr:'#c82030'},
   {id:'pei-xiu',       rarity:'common', name:'Pei Xiu',                  char:'裴宿',    sub:'Unseen until too late',               img:"gacha/Pei Xiu.jpg",                     imgPos:'50% 20%'},
   {id:'heavenly-ct',   rarity:'common', name:'Heavenly Court',           char:'天庭',    sub:'High above the clouds',               img:"gacha/Heavenly Court.jpeg",             imgPos:'50% 30%'},
-  {id:'xl-shackles',   rarity:'common', name:"Xie Lian's Shackles",      char:'谢怜',    sub:'Worn with grace',                     img:"gacha/Xie Lian's Shackles.jpg",         imgPos:'50% 30%'},
 
   /* ── RARE (25) ── */
   {id:'xl-regalia',    rarity:'rare', name:'Crown Prince Regalia',       char:'谢怜',      sub:'God of Xianle',                      img:IMG.lanterns,                                  imgPos:'50% 35%'},
@@ -927,11 +992,13 @@ const STICKERS=[
   {id:'hc-horse',      rarity:'rare', name:'Stepping Into Wind',         char:'花城',      sub:'Lord of Ghost City',                 img:IMG.crimson,                                   imgPos:'50% 15%'},
   {id:'xl-sorrow',     rarity:'rare', name:'Beautiful Sorrow',           char:'谢怜',      sub:'Even this, beautiful',               img:"gacha/xie lian.jpg",                          imgPos:'50% 25%'},
   {id:'hualian-cave',  rarity:'rare', name:'The Cave',                   char:'花城·谢怜', sub:'I have liked you for a long time',   img:"gacha/The Cave .jpg",                         imgPos:'50% 50%'},
-  {id:'mu-feng-r',     rarity:'rare', name:'Mu Qing & Feng Xin',        char:'慕情·风信', sub:'Brothers in arms',                   img:"gacha/Mu Qing & Feng Xin.jpg",                imgPos:'50% 30%'},
+  {id:'mu-feng-r',     rarity:'rare', name:'Mu Qing & Feng Xin',        char:'慕情·风信', sub:'Two generals, one prince',            img:"gacha/Mu Qing & Feng Xin.jpg",                imgPos:'50% 30%'},
   {id:'ghost-city-r',  rarity:'rare', name:'Lord of Ghost City',         char:'花城',      sub:'Welcome, welcome',                   img:"gacha/Lord of Ghost City.jpg",                imgPos:'50% 30%'},
   {id:'bwx-r',         rarity:'rare', name:'White No-Face Rises',        char:'白无相',    sub:'Your highness, please smile',        img:"gacha/White No-Face Rises.jpg",               imgPos:'50% 25%'},
-  {id:'sword-rain-r',  rarity:'rare', name:'Three Hundred Swords',       char:'谢怜',      sub:'Still he did not fall',              img:"gacha/Three Hundred Swords.jpg",              imgPos:'50% 30%'},
+  {id:'sword-rain-r',  rarity:'rare', name:'One Hundred Swords',           char:'谢怜',      sub:'Still he did not fall',              img:"gacha/Three Hundred Swords.jpg",              imgPos:'50% 30%'},
   {id:'hx-deep',       rarity:'rare', name:'Black Water Sinking',        char:'贺玄',      sub:'The bottom of the sea',              img:"gacha/Black Water Sinking.jpg",               imgPos:'50% 30%'},
+  {id:'ming-yi',       rarity:'rare', name:'Ming Yi',                    char:'明仪',      sub:'He Xuan, hidden in plain sight',     img:"gacha/Ming Yi.jpg",                           imgPos:'50% 20%'},
+  {id:'wind-bw',       rarity:'rare', name:'Wind and Black Water',       char:'师青玄·贺玄', sub:'A debt carved in the soul',          img:"gacha/Wind and Black Water.jpg",              imgPos:'50% 30%'},
   {id:'first-lantern', rarity:'rare', name:'First Lantern Night',        char:'花城·谢怜', sub:'The beginning of everything',        img:"gacha/First Lantern Night.jpg",               imgPos:'50% 30%'},
   {id:'qi-rong-r',     rarity:'rare', name:'Green Ghost Prince',         char:'戚容',      sub:'Your cousin is here',                img:"gacha/Green Ghost Prince.webp",               imgPos:'50% 25%'},
   {id:'martial-god',   rarity:'rare', name:'God of Martial Arts',        char:'谢怜',      sub:'Three times ascended',               img:"gacha/God of Martial Arts.jpg",               imgPos:'50% 30%'},
@@ -939,22 +1006,24 @@ const STICKERS=[
   {id:'gen-pei',       rarity:'rare', name:'General Pei',                char:'裴茗',      sub:'Above the northern heavens',         img:"gacha/General Pei.jpg",                       imgPos:'50% 30%'},
   {id:'sqx-fan',       rarity:'rare', name:'Wind Master & Fan',          char:'师青玄',    sub:'The fan never lies',                 img:"gacha/Wind Master & Fan.jpg",                 imgPos:'50% 30%'},
   {id:'hualian-dance', rarity:'rare', name:'The Dance',                  char:'花城·谢怜', sub:'Only for you',                       img:"gacha/The Dance.jpg",                         imgPos:'50% 30%'},
-  {id:'e-ming-r',      rarity:'rare', name:"E'Ming Awakens",             char:'厄命',      sub:'The scimitar wants blood',           img:"gacha/E'Ming Awakens.jpg",                    imgPos:'50% 30%'},
+  {id:'ordinary-days', rarity:'rare', name:'Ordinary Days',              char:'花城·谢怜', sub:'This, above all, was enough',         img:"gacha/ordinary days.jpg",                     imgPos:'50% 30%'},
   {id:'xl-mortal',     rarity:'rare', name:'Mortal Xie Lian',            char:'谢怜',      sub:'Just a man with a broom',            img:"gacha/Mortal Xie Lian.webp",                  imgPos:'50% 30%'},
-  {id:'lw-scrolls',    rarity:'rare', name:'Ling Wen Burning',           char:'灵文',      sub:'All the scrolls, all the time',      img:IMG.together,                                  imgPos:'50% 30%'},
+  {id:'lw-scrolls',    rarity:'rare', name:'Ling Wen Burning',           char:'灵文',      sub:'All the scrolls, all the time',      img:"gacha/Ling Wen.jpg",                          imgPos:'50% 20%'},
   {id:'hualian-vow',   rarity:'rare', name:'The Promise',                char:'花城·谢怜', sub:'I will always be here',              img:"gacha/Wedding Crimson Rain.jpeg",              imgPos:'50% 30%'},
 
-  /* ── LEGENDARY (12) ── */
+  /* ── LEGENDARY (14) ── */
   {id:'hualian',       rarity:'legendary', name:'Ten Thousand Lanterns',    char:'花城·谢怜', sub:'For you, every light',                        img:IMG.lanterns,                             imgPos:'50% 42%'},
+  {id:'crimson-thread',rarity:'legendary', name:'Crimson Thread',           char:'花城·谢怜', sub:'Found across every lifetime',                 img:"gacha/crimson thread.jpg",               imgPos:'50% 35%'},
+  {id:'water-memory',  rarity:'legendary', name:'The Water Remembers',      char:'花城·谢怜', sub:'Two reflections, one truth',                  img:"gacha/the water remembers.jpg",          imgPos:'50% 40%'},
   {id:'crown',         rarity:'legendary', name:'The Crown Returned',        char:'花城·谢怜', sub:'As it always should have been',               img:IMG.together,                             imgPos:'50% 30%'},
-  {id:'sovereign',     rarity:'legendary', name:'Crown Prince, Sovereign',   char:'仙乐太子',  sub:'The realm bows',                              img:IMG.release,                              imgPos:'50% 20%'},
+  {id:'sovereign',     rarity:'legendary', name:'What He Wished For',         char:'仙乐太子',  sub:'Eight hundred years of lanterns',             img:IMG.release,                              imgPos:'50% 20%'},
   {id:'san-gege',      rarity:'legendary', name:'San Lang & Gege',           char:'花城·谢怜', sub:'Eight hundred years',                         img:"gacha/other image.jpg",                  imgPos:'50% 30%'},
   {id:'cr-ascend',     rarity:'legendary', name:'Crimson Rain Ascends',      char:'血雨探花',  sub:'The most notorious ghost in history',         img:IMG.crimson,                              imgPos:'50% 30%'},
   {id:'xl-thrice',     rarity:'legendary', name:'Three Times Beloved',       char:'仙乐太子',  sub:'The only god with no worshippers',            img:"gacha/Three Times Beloved.jpg",          imgPos:'50% 30%'},
   {id:'forever-800',   rarity:'legendary', name:'Forever and Eight Hundred', char:'花城·谢怜', sub:'Gege, I have liked you for a very long time', img:"gacha/more image.jpg",                   imgPos:'50% 40%'},
   {id:'red-thread',    rarity:'legendary', name:'Fated Red Thread',          char:'花城·谢怜', sub:'Across every lifetime',                       img:"gacha/Fated Red Thread.jpg",             imgPos:'50% 30%'},
   {id:'butterfly-pal', rarity:'legendary', name:'Palace of Silver Wings',    char:'花城',      sub:'Built every stone for you',                   img:"gacha/Palace of Silver Wings.jpg",       imgPos:'50% 30%'},
-  {id:'xl-calamity',   rarity:'legendary', name:'The Third Calamity',        char:'谢怜',      sub:'Even so, I do not regret',                    img:IMG.release,                              imgPos:'50% 38%'},
+  {id:'xl-calamity',   rarity:'legendary', name:'Beneath the Veil',           char:'花城·谢怜', sub:'Red robes, white veil, eight hundred years',  img:"gacha/beneath the veil.jpg",             imgPos:'50% 30%'},
   {id:'into-rain',     rarity:'legendary', name:'Into the Rain',             char:'花城·谢怜', sub:'I will shelter you from every storm',         img:"gacha/another image.jpg",                imgPos:'50% 40%'},
   {id:'gods-ghosts',   rarity:'legendary', name:'God and Ghost King',        char:'花城·谢怜', sub:'Heaven and earth cannot keep us apart',       img:"gacha/extra image.jpg",                  imgPos:'50% 35%'},
 ];
@@ -1430,7 +1499,7 @@ const RARITY_THEME={
 let _dcTilt=null;
 function showCardDetail(id){
   const st=STICKERS.find(s=>s.id===id);if(!st)return;
-  if(!(state.collection||[]).includes(st.id))return; // only owned
+  if(!(state.collection||[]).includes(st.id))return;
   const th=RARITY_THEME[st.rarity]||RARITY_THEME.common;
   const ov=document.getElementById('detail-ov');
   const cardEl=document.getElementById('detail-card');
@@ -1464,12 +1533,19 @@ function showCardDetail(id){
 }
 function closeCardDetail(){
   const ov=document.getElementById('detail-ov');
-  ov.classList.remove('open');
+  ov.classList.remove('open','cinematic');
   const cardEl=document.getElementById('detail-card');
   cardEl.style.transform='';
   if(_dcTilt){document.removeEventListener('mousemove',_dcTilt);_dcTilt=null;}
 }
-document.getElementById('detail-ov').addEventListener('click',closeCardDetail);
+document.getElementById('detail-ov').addEventListener('click',function(e){
+  const card=document.getElementById('detail-card');
+  if(card.contains(e.target)){
+    this.classList.toggle('cinematic');
+  } else {
+    closeCardDetail();
+  }
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('detail-ov').classList.contains('open')){e.preventDefault();closeCardDetail();}});
 
 /* ── BOOT ── */
