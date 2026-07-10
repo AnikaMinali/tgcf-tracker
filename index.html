@@ -83,15 +83,15 @@ body{font-family:'Noto Serif',serif;color:var(--ivory);}
   .sc-body{padding:16px 14px 100px;}
   #sc-overview .sc-body{padding:8px 14px 100px;}
 
-  /* Overview — sticky chibi strip, stats scroll beneath */
-  .ov-layout{gap:0;padding-top:0;}
-  .chibi-stage{position:sticky;top:50px;z-index:3;width:100%;height:190px;background:rgba(1,0,6,0.88);backdrop-filter:blur(8px);}
+  /* Overview — stats on top, chibis + quotes at bottom */
+  .ov-layout{display:flex;flex-direction:column;gap:16px;padding-top:8px;}
+  .chibi-stage{order:2;position:relative;top:auto;width:100%;height:220px;}
+  .ov-right{order:1;padding-top:0;}
   .chibi{height:110px;width:90px;object-fit:contain;}
   .c-hc{left:2px;}
   .c-xl{right:2px;}
   .chibi-ground{bottom:52px;}
   .chibi-wrap{bottom:54px;}
-  .ov-right{padding-top:16px;}
   .ov-sp-num{font-size:44px;}
   .ov-rank{font-size:24px;}
   .ov-prog{max-width:100%;}
